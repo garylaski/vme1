@@ -27,7 +27,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
     // Upgrade HTTP connection to websocket
     conn, err := upgrader.Upgrade(w, r, nil)
     if err != nil {
-        log.Fatal(err)
+        log.Printf("upgrader.Upgrade: %v", err)
     }
     defer conn.Close()
     data := make(chan []byte)
@@ -40,7 +40,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
         case pcmData := <-data:
             err = conn.WriteMessage(websocket.BinaryMessage, pcmData)
             if err != nil {
-                log.Fatal(err)
+                log.Printf("conn.WriteMessage: %v", err)
             }
         case <-done:
             return
@@ -72,7 +72,10 @@ func sendPCM(data chan []byte, done chan struct{}) {
         if time.Since(t) >= dt {
             t = time.Now()
             if buf, err = source.Read(); err != nil {
-                log.Fatal(err)
+                log.Printf("source.Read: %v", err)
+            }
+            if buf == nil {
+                return
             }
             select {
             case data <- buf:

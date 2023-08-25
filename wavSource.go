@@ -10,7 +10,6 @@ import (
 type wavSource struct {
     Decoder *wav.Decoder
     File    *os.File
-    Buffer  *audio.IntBuffer
 }
 
 func (w *wavSource) Init() (int, int, int) {
@@ -28,15 +27,15 @@ func (w *wavSource) Init() (int, int, int) {
     sampleRate := w.Decoder.SampleRate
     numChans := w.Decoder.NumChans
     bitDepth := w.Decoder.BitDepth
-    intBufferSize := byteBufferSize / ((bitDepth / 8)*numChans)
-    w.Buffer = &audio.IntBuffer{Data: make([]int, intBufferSize)}
     return int(sampleRate), int(numChans), int(bitDepth)
 }
 
 func (w *wavSource) Read() ([]byte, error) {
     // Read audio frames from the decoder
-    if _, err := w.Decoder.PCMBuffer(w.Buffer); err != nil {
+    buffer := &audio.IntBuffer{Data: make([]int, byteBufferSize)}
+    if _, err := w.Decoder.PCMBuffer(buffer); err != nil {
         return nil, err
     }
-    return pcmIntToBytes(w.Buffer.Data, w.Decoder.BitDepth), nil
+
+    return pcmIntToBytes(buffer.Data, w.Decoder.BitDepth), nil
 }
