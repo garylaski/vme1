@@ -1,0 +1,8 @@
+#content {
+    margin: 0 auto;
+    width: 60vw;
+}
+#content * {
+    text-align: center;
+    margin: 0 auto;
+}
