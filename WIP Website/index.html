@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Visual Mixer and Equalizer</title>
+        <script type="module" src="/script.js"></script>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div id="content">
+            <header>
+                <h1>Visual Mixer and Equalizer</h1>
+            </header>
+            <div id="graphs">
+                <img src="test1.png" class=graph id=graph1 alt="Test graph 1"/>
+                <img src="test2.png" class=graph id=graph2 alt="Test graph 2"/>
+                <img src="test3.png" class=graph id=graph3 alt="Test graph 3"/>
+                <img src="test4.png" class=graph id=graph4 alt="Test graph 4"/>
+            </div>
+            <!-- app content goes here -->
+            <div class="wrapper">
+                <canvas class="visualizer" width="640" height="400"></canvas>
+            </div>
+        </div>
+
+    <script>
+var coll = document.getElementsByClassName("graph");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    if (this.style.width === "80%") {
+      this.style.width = "40%";
+      this.style.height = "40%";
+    } else {
+      this.style.width = "80%";
+      this.style.height = "80%";
+    }
+
+    var graph = this;
+    var j;
+
+    for (j = i - 1; j >= 0; --j) {
+        graph = graph.previousElementSibling;
+        if (this.style.width === "40%") {
+          graph.style.display = "initial";
+        } else {
+          graph.style.display = "none";
+        }
+    }
+
+    graph = this;
+
+    for (j = i + 1; j <= coll.length; ++j) {
+        graph = graph.nextElementSibling;
+        if (this.style.width === "40%") {
+          graph.style.display = "initial";
+        } else {
+          graph.style.display = "none";
+        }
+    }
+  });
+}
+</script>
+
+    </body>
+</html>
