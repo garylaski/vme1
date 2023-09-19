@@ -4,7 +4,6 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Visual Mixer and Equalizer</title>
-        <script type="module" src="/script.js"></script>
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
@@ -24,7 +23,7 @@
             </div>
         </div>
 
-    <script>
+<script>
 var coll = document.getElementsByClassName("graph");
 var i;
 
@@ -39,25 +38,32 @@ for (i = 0; i < coll.length; i++) {
     }
 
     var graph = this;
-    var j;
+    var graph2 = this;
 
-    for (j = i - 1; j >= 0; --j) {
-        graph = graph.previousElementSibling;
-        if (this.style.width === "40%") {
-          graph.style.display = "initial";
-        } else {
-          graph.style.display = "none";
+    while (graph || graph2) {
+        if (graph) {
+            graph = graph.previousElementSibling;
         }
-    }
 
-    graph = this;
+        if (graph2) {
+            graph2 = graph2.nextElementSibling;
+        }
 
-    for (j = i + 1; j <= coll.length; ++j) {
-        graph = graph.nextElementSibling;
+        
         if (this.style.width === "40%") {
-          graph.style.display = "initial";
+          if (graph) {
+              graph.style.display = "initial";
+          }
+          if (graph2) {
+              graph2.style.display = "initial";
+          }
         } else {
-          graph.style.display = "none";
+          if (graph) {
+              graph.style.display = "none";
+          }
+          if (graph2) {
+              graph2.style.display = "none";
+          }
         }
     }
   });
