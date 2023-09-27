@@ -5,17 +5,70 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Visual Mixer and Equalizer</title>
         <script type="module" src="/script.js"></script>
-        <link rel="stylesheet" href="/style.css">
+        <link rel="stylesheet" href="style.css">
     </head>
     <body>
         <div id="content">
-            <header>
-                <h1>Visual Mixer and Equalizer</h1>
-            </header>
-            <!-- app content goes here -->
-            <div class="wrapper">
-                <canvas class="visualizer" width="640" height="400"></canvas>
+            <div class="visualizer">
+                <canvas></canvas>
+            </div>
+            <div class="visualizer">
+                <canvas></canvas>
+            </div>
+            <div class="visualizer">
+                <canvas></canvas>
+            </div>
+            <div class="visualizer">
+                <canvas></canvas>
             </div>
         </div>
+        <script>
+            var coll = document.getElementsByClassName("visualizer");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+                coll[i].addEventListener("click", function() {
+                    if (this.style.width === "80%") {
+                        this.style.width = "40%";
+                        this.style.height = "40%";
+                    } else {
+                        this.style.width = "80%";
+                        this.style.height = "80%";
+                    }
+
+                    var graph = this;
+                    var graph2 = this;
+
+                    while (graph || graph2) {
+                        if (graph) {
+                            graph = graph.previousElementSibling;
+                        }
+
+                        if (graph2) {
+                            graph2 = graph2.nextElementSibling;
+                        }
+
+
+                        if (this.style.width === "40%") {
+                            if (graph) {
+                                graph.style.display = "initial";
+                            }
+                            if (graph2) {
+                                graph2.style.display = "initial";
+                            }
+                        } else {
+                            if (graph) {
+                                graph.style.display = "none";
+                            }
+                            if (graph2) {
+                                graph2.style.display = "none";
+                            }
+                        }
+                    }
+                });
+            }
+        </script>
+
     </body>
 </html>
+

@@ -1,7 +1,6 @@
 // connect to websocket and receive PCM data and play it
 
 import PCMPlayer from "./pcm-player.js";
-var player;
 var ws = new WebSocket("ws://localhost:8080/ws");
 ws.binaryType = "arraybuffer";
 
@@ -10,7 +9,7 @@ ws.onopen = function() {
 }
 
 var first = true;
-var sampleRate, channels, bitsPerSample, bufferSize;
+var sampleRate, channels, bitsPerSample, bufferSize, player;
 ws.onmessage = function(evt) {
     let data = new Int32Array(evt.data);
     if (first) {
@@ -48,32 +47,37 @@ function init_visualizer(player) {
     player.analyser = player.audioCtx.createAnalyser();
     player.gainNode.connect(player.analyser)
     player.analyser.connect(player.audioCtx.destination)
-    const canvas = document.querySelector(".visualizer");
-    player.canvasCtx = canvas.getContext("2d"); 
+    player.canvasCtx = [];
+    let canvas = document.getElementsByTagName("canvas");
+    for (let i = 0; i < canvas.length; i++) {
+        player.canvasCtx[i] = canvas[i].getContext("2d"); 
+        player.WIDTH = canvas[i].width;
+        player.HEIGHT = canvas[i].height;
+    }
     player.analyser.fftSize = 256;
     player.bufferLengthAlt = player.analyser.frequencyBinCount;
     player.dataArrayAlt = new Uint8Array(player.bufferLengthAlt);
-    player.WIDTH = canvas.width;
-    player.HEIGHT = canvas.height;
     player.barWidth = (player.WIDTH / player.bufferLengthAlt) * 2.5;
     player.visualize = function() {
         if (!this) return;
-        this.canvasCtx.clearRect(0, 0, this.WIDTH, this.HEIGHT);
         this.drawVisual = requestAnimationFrame(this.visualize);
         this.analyser.getByteFrequencyData(this.dataArrayAlt);
-        this.canvasCtx.fillStyle = "rgb(0, 0, 0)";
-        this.canvasCtx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
-        this.x = 0;
-        for (let i = 0; i < this.bufferLengthAlt; i++) {
-            this.barHeight = this.dataArrayAlt[i];
-            this.canvasCtx.fillStyle = "rgb(" + (this.barHeight + 100) + ",50,50)";
-            this.canvasCtx.fillRect(
-                this.x,
-                this.HEIGHT - this.barHeight / 2,
-                this.barWidth,
-                this.barHeight / 2
-            );
-            this.x += this.barWidth + 1;
+        for (let i = 0; i < this.canvasCtx.length; i++) {
+            this.canvasCtx[i].clearRect(0, 0, this.WIDTH, this.HEIGHT);
+            this.canvasCtx[i].fillStyle = "rgb(0, 0, 0)";
+            this.canvasCtx[i].fillRect(0, 0, this.WIDTH, this.HEIGHT);
+            this.x = 0;
+            for (let j = 0; j < this.bufferLengthAlt; j++) {
+                this.barHeight = this.dataArrayAlt[j];
+                this.canvasCtx[i].fillStyle = "rgb(" + (this.barHeight + 100) + ",50,50)";
+                this.canvasCtx[i].fillRect(
+                    this.x,
+                    this.HEIGHT - this.barHeight / 2,
+                    this.barWidth,
+                    this.barHeight / 2
+                );
+                this.x += this.barWidth + 1;
+            }
         }
     }
 }
