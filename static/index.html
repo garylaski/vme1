@@ -29,8 +29,8 @@
             for (i = 0; i < coll.length; i++) {
                 coll[i].addEventListener("click", function() {
                     if (this.style.width === "80%") {
-                        this.style.width = "40%";
-                        this.style.height = "40%";
+                        this.style.width = "20%";
+                        this.style.height = "20%";
                     } else {
                         this.style.width = "80%";
                         this.style.height = "80%";
@@ -49,12 +49,12 @@
                         }
 
 
-                        if (this.style.width === "40%") {
+                        if (this.style.width === "20%") {
                             if (graph) {
-                                graph.style.display = "initial";
+                                graph.style.display = "block";
                             }
                             if (graph2) {
-                                graph2.style.display = "initial";
+                                graph2.style.display = "block";
                             }
                         } else {
                             if (graph) {

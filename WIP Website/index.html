@@ -12,10 +12,21 @@
                 <h1>Visual Mixer and Equalizer</h1>
             </header>
             <div id="graphs">
-                <img src="test1.png" class=graph id=graph1 alt="Test graph 1"/>
-                <img src="test2.png" class=graph id=graph2 alt="Test graph 2"/>
-                <img src="test3.png" class=graph id=graph3 alt="Test graph 3"/>
-                <img src="test4.png" class=graph id=graph4 alt="Test graph 4"/>
+                <div class=graph>
+                    <img src="test1.png" id=graph1 alt="Test graph 1"/>
+                </div>
+
+                <div class=graph>
+                    <img src="test2.png" id=graph2 alt="Test graph 2"/>
+                </div>
+
+                <div class=graph>
+                    <img src="test3.png" id=graph3 alt="Test graph 3"/>
+                </div>
+
+                <div class=graph>
+                    <img src="test4.png" id=graph4 alt="Test graph 4"/>
+                </div>
             </div>
             <!-- app content goes here -->
             <div class="wrapper">
@@ -30,11 +41,9 @@ var i;
 for (i = 0; i < coll.length; i++) {
   coll[i].addEventListener("click", function() {
     if (this.style.width === "80%") {
-      this.style.width = "40%";
-      this.style.height = "40%";
+      this.style.width = "20%";
     } else {
       this.style.width = "80%";
-      this.style.height = "80%";
     }
 
     var graph = this;
@@ -50,12 +59,12 @@ for (i = 0; i < coll.length; i++) {
         }
 
         
-        if (this.style.width === "40%") {
+        if (this.style.width === "20%") {
           if (graph) {
-              graph.style.display = "initial";
+              graph.style.display = "block";
           }
           if (graph2) {
-              graph2.style.display = "initial";
+              graph2.style.display = "block";
           }
         } else {
           if (graph) {
