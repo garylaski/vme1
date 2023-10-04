@@ -24,7 +24,7 @@ ws.onmessage = function(evt) {
             inputCodec: "Int" + bitsPerSample,
             channels: channels,
             sampleRate: sampleRate,
-            flushingTime: 200
+            flushingTime: 400
         });
         init_visualizer(player);
     } else {
@@ -44,40 +44,57 @@ ws.onerror = function(err) {
 }
 
 function init_visualizer(player) {
-    player.analyser = player.audioCtx.createAnalyser();
-    player.gainNode.connect(player.analyser)
-    player.analyser.connect(player.audioCtx.destination)
-    player.canvasCtx = [];
-    let canvas = document.getElementsByTagName("canvas");
-    for (let i = 0; i < canvas.length; i++) {
-        player.canvasCtx[i] = canvas[i].getContext("2d"); 
-        player.WIDTH = canvas[i].width;
-        player.HEIGHT = canvas[i].height;
+    player.splitter = player.audioCtx.createChannelSplitter(4);
+    player.gainNode.connect(player.splitter);
+    player.analysers = [];
+    player.dataArrays = [];
+    player.promises = [];
+    for (let i = 0; i < 4; i++) {
+        player.analysers[i] = player.audioCtx.createAnalyser();
+        player.analysers[i].fftSize = 256;
+        player.splitter.connect(player.analysers[i], i);
+        player.dataArrays[i] = new Uint8Array(player.analysers[i].frequencyBinCount);
+        player.bufferLengthAlt = player.analysers[i].frequencyBinCount;
     }
-    player.analyser.fftSize = 256;
-    player.bufferLengthAlt = player.analyser.frequencyBinCount;
-    player.dataArrayAlt = new Uint8Array(player.bufferLengthAlt);
-    player.barWidth = (player.WIDTH / player.bufferLengthAlt) * 2.5;
+    player.canvasCtx = [];
+    player.canvas = document.getElementsByTagName("canvas");
+    player.parent = document.getElementsByClassName("visualizer");
+    for (let i = 0; i < player.canvas.length; i++) {
+        player.canvasCtx[i] = player.canvas[i].getContext("2d"); 
+        player.canvasCtx[i].imageSmoothingEnabled = false
+    }
     player.visualize = function() {
         if (!this) return;
         this.drawVisual = requestAnimationFrame(this.visualize);
-        this.analyser.getByteFrequencyData(this.dataArrayAlt);
         for (let i = 0; i < this.canvasCtx.length; i++) {
-            this.canvasCtx[i].clearRect(0, 0, this.WIDTH, this.HEIGHT);
-            this.canvasCtx[i].fillStyle = "rgb(0, 0, 0)";
-            this.canvasCtx[i].fillRect(0, 0, this.WIDTH, this.HEIGHT);
-            this.x = 0;
-            for (let j = 0; j < this.bufferLengthAlt; j++) {
-                this.barHeight = this.dataArrayAlt[j];
-                this.canvasCtx[i].fillStyle = "rgb(" + (this.barHeight + 100) + ",50,50)";
-                this.canvasCtx[i].fillRect(
-                    this.x,
-                    this.HEIGHT - this.barHeight / 2,
-                    this.barWidth,
-                    this.barHeight / 2
-                );
-                this.x += this.barWidth + 1;
-            }
+            this.promises.push(new Promise((resolve, reject) => {
+                this.analysers[i].getByteFrequencyData(this.dataArrays[i]);
+                if (this.parent[i].display == "none") {
+                    resolve();
+                    return;
+                }
+                this.canvas[i].width = this.parent[i].offsetWidth;
+                this.canvas[i].height = this.parent[i].offsetHeight;
+                this.barWidth = (this.canvas[i].width / this.bufferLengthAlt) * 2.5;
+                this.canvasCtx[i].clearRect(0, 0, this.canvas[i].width, this.canvas[i].height);
+                this.canvasCtx[i].fillStyle = "rgb(0, 0, 0)";
+                this.canvasCtx[i].fillRect(0, 0, this.canvas[i].width, this.canvas[i].height);
+                let x = 0;
+                this.canvasCtx[i].fillStyle = "rgb(255,50,50)";
+                for (let j = 0; j < this.bufferLengthAlt; j++) {
+                    this.canvasCtx[i].fillRect(
+                        x,
+                        this.canvas[i].height - this.dataArrays[i][j],
+                        this.barWidth,
+                        this.dataArrays[i][j]
+                    );
+                    x += this.barWidth + 1;
+                }
+                resolve();
+            }));
         }
+        Promise.all(this.promises).then(() => {
+            this.promises = [];
+        });
     }
 }
