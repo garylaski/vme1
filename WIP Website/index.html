@@ -14,18 +14,22 @@
             <div id="graphs">
                 <div class=graph>
                     <img src="test1.png" id=graph1 alt="Test graph 1"/>
+                    <div class=graphNum>1</div>
                 </div>
 
                 <div class=graph>
                     <img src="test2.png" id=graph2 alt="Test graph 2"/>
+                    <div class=graphNum>2</div>
                 </div>
 
                 <div class=graph>
                     <img src="test3.png" id=graph3 alt="Test graph 3"/>
+                    <div class=graphNum>3</div>
                 </div>
 
                 <div class=graph>
                     <img src="test4.png" id=graph4 alt="Test graph 4"/>
+                    <div class=graphNum>4</div>
                 </div>
             </div>
             <!-- app content goes here -->
@@ -41,9 +45,9 @@ var i;
 for (i = 0; i < coll.length; i++) {
   coll[i].addEventListener("click", function() {
     if (this.style.width === "80%") {
-      this.style.width = "20%";
+        this.style.width = "20%";
     } else {
-      this.style.width = "80%";
+        this.style.width = "80%";
     }
 
     var graph = this;

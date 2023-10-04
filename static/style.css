@@ -12,3 +12,10 @@ canvas {
     object-fit: cover;
     object-position: right;
 }
+
+.visualizerNum {
+  position: relative;
+  top: -100%;
+  right: -1%;
+  color: #ffffff;
+}
