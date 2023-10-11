@@ -32,10 +32,10 @@
 
             for (i = 0; i < coll.length; i++) {
                 coll[i].addEventListener("click", function() {
-                    if (this.style.width === "80%") {
-                        this.style.width = "20%";
+                    if (this.style.width === "100%") {
+                        this.style.width = "25%";
                     } else {
-                        this.style.width = "80%";
+                        this.style.width = "100%";
                     }
 
                     var graph = this;
@@ -51,7 +51,7 @@
                         }
 
 
-                        if (this.style.width === "20%") {
+                        if (this.style.width === "25%") {
                             if (graph) {
                                 graph.style.display = "block";
                             }
