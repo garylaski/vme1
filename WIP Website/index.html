@@ -12,12 +12,15 @@
 function showGraph(num)
 {
     var graphs = document.getElementsByClassName("graph");
+    var graphSelectors = document.getElementsByClassName("graphSelector");
     for (var i = 0; i < graphs.length; ++i)
     {
         graphs[i].style.display = "none";
+        graphSelectors[i].style.background = "white"
     }
     
     graphs[num - 1].style.display = "block";
+    graphSelectors[num-1].style.background = "lightgrey"
     return false;
 }
 </script>
@@ -26,10 +29,10 @@ function showGraph(num)
                 <h1>Visual Mixer and Equalizer</h1>
             </header>
             <div id="graphSelect">
-                <button class="graphSelector" id="select1" onclick="showGraph(1)">Graph 1</button>
-                <button class="graphSelector" id="select2" onclick="showGraph(2)">Graph 2</button>
-                <button class="graphSelector" id="select3" onclick="showGraph(3)">Graph 3</button>
-                <button class="graphSelector" id="select4" onclick="showGraph(4)">Graph 4</button>
+                <button class="graphSelector" id="select1" onclick="showGraph(1)"><b>1</b></button>
+                <button class="graphSelector" id="select2" onclick="showGraph(2)"><b>2</b></button>
+                <button class="graphSelector" id="select3" onclick="showGraph(3)"><b>3</b></button>
+                <button class="graphSelector" id="select4" onclick="showGraph(4)"><b>4</b></button>
             </div>
 
             <div id="graphs">
@@ -49,9 +52,27 @@ function showGraph(num)
                     <img src="test4.png" alt="Test graph 4"/>
                 </div>
             </div>
-            <!-- app content goes here -->
-            <div class="wrapper">
-                <canvas class="visualizer" width="640" height="400"></canvas>
+
+            <div id="controls">
+                <div class="graphControl">
+                    
+                </div>
+
+                <div class="graphControl">
+                    
+                </div>
+
+                <div class="graphControl">
+                    
+                </div>
+
+                <div class="graphControl">
+                    
+                </div>
+
+                <div class="graphControl">
+                    
+                </div>
             </div>
         </div>
     </body>

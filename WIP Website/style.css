@@ -2,21 +2,41 @@
     width: 20%;
     height: max(40vh, 200px);
     border: 1px solid #000000;
+    box-sizing:border-box;
     display: flex;
     justify-content: center;
     flex-direction: column;
+    align-items: center;
     float:left;
 }
 
 .graphSelector {
-    margin: 10px;
+    width: 80px;
+    border: none;
+    color: white;
+    padding: 16px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    background: white; 
+    color: black; 
+    border: 2px solid #000000;
+}
+
+.graphSelector:hover {
+    background: lightgrey!important; 
 }
 
 #graphs {
     padding: 0;
-    width: 70%;
+    width: 80%;
     height: max(40vh, 200px);
     border: 1px solid #000000;
+    box-sizing:border-box;
     float:left;
 }
 
@@ -24,9 +44,22 @@
     padding: 0;
     width: 100%;
     height: 100%;
-    border: 1px solid #000000;
-    float:left;
     display: none;
+}
+
+#controls {
+    width: 100%;
+    height: 40vh;
+    box-sizing:border-box;
+    float:left;
+}
+
+.graphControl {
+    width: 20%;
+    height: 100%;
+    border: 1px solid #000000;
+    box-sizing:border-box;
+    float:left;
 }
 
 img {
