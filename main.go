@@ -15,7 +15,7 @@ func main() {
 
 const (
     // The size we send per websocket message, bigger = better? 
-    byteBufferSize = 1024
+    byteBufferSize = 1024*11
 )
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,6 +41,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
             err = conn.WriteMessage(websocket.BinaryMessage, pcmData)
             if err != nil {
                 log.Printf("conn.WriteMessage: %v", err)
+		return
             }
         case <-done:
             return
@@ -67,6 +68,7 @@ func sendPCM(data chan []byte, done chan struct{}) {
     data <- pcmIntToBytes([]int{sampleRate, numChans, bitDepth}, 32)
     // Calculate the time between each PCM data send lol
     dt := time.Second * time.Duration(byteBufferSize / bitDepth) / (time.Duration(sampleRate))
+    log.Printf("dt: %v", dt)
     t := time.Now()
     for {
         if time.Since(t) >= dt {
@@ -75,6 +77,8 @@ func sendPCM(data chan []byte, done chan struct{}) {
                 log.Printf("source.Read: %v", err)
             }
             if buf == nil {
+		log.Printf("Sending done signal")
+		done <- struct{}{}
                 return
             }
             select {

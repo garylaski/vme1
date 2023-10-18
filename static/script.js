@@ -1,7 +1,7 @@
 // connect to websocket and receive PCM data and play it
 
 import PCMPlayer from "./pcm-player.js";
-var ws = new WebSocket("ws://localhost:8080/ws");
+var ws = new WebSocket("ws://"+window.location.host+"/ws");
 ws.binaryType = "arraybuffer";
 
 ws.onopen = function() {
