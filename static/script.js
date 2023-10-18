@@ -9,7 +9,8 @@ ws.onopen = function() {
 }
 
 var first = true;
-var sampleRate, channels, bitsPerSample, bufferSize, player;
+var second = false;
+var sampleRate, channels, bitsPerSample, bufferSize, player, second;
 ws.onmessage = function(evt) {
     let data = new Int32Array(evt.data);
     if (first) {
@@ -24,12 +25,16 @@ ws.onmessage = function(evt) {
             inputCodec: "Int" + bitsPerSample,
             channels: channels,
             sampleRate: sampleRate,
-            flushingTime: 400
+            flushingTime: 600
         });
         init_visualizer(player);
+	second = true;
     } else {
         player.feed(evt.data);
-        player.visualize();
+	if (second && player != undefined) {
+	    requestAnimationFrame(player.visualize);
+	    second = false;
+	}
     }
 }
 
@@ -63,38 +68,37 @@ function init_visualizer(player) {
         player.canvasCtx[i] = player.canvas[i].getContext("2d"); 
         player.canvasCtx[i].imageSmoothingEnabled = false
     }
-    player.visualize = function() {
-        if (!this) return;
-        this.drawVisual = requestAnimationFrame(this.visualize);
-        for (let i = 0; i < this.canvasCtx.length; i++) {
-            this.promises.push(new Promise((resolve, reject) => {
-                this.analysers[i].getByteFrequencyData(this.dataArrays[i]);
-                if (this.parent[i].display == "none") {
+    player.visualize = function(ms) {
+        for (let i = 0; i < player.canvasCtx.length; i++) {
+            player.promises.push(new Promise((resolve, reject) => {
+                player.analysers[i].getByteFrequencyData(player.dataArrays[i]);
+                if (player.parent[i].display == "none") {
                     resolve();
                     return;
                 }
-                this.canvas[i].width = this.parent[i].offsetWidth;
-                this.canvas[i].height = this.parent[i].offsetHeight;
-                this.barWidth = (this.canvas[i].width / this.bufferLengthAlt) * 2.5;
-                this.canvasCtx[i].clearRect(0, 0, this.canvas[i].width, this.canvas[i].height);
-                this.canvasCtx[i].fillStyle = "rgb(0, 0, 0)";
-                this.canvasCtx[i].fillRect(0, 0, this.canvas[i].width, this.canvas[i].height);
+                player.canvas[i].width = player.parent[i].offsetWidth;
+                player.canvas[i].height = player.parent[i].offsetHeight;
+                player.barWidth = (player.canvas[i].width / player.bufferLengthAlt) * 2.5;
+                player.canvasCtx[i].clearRect(0, 0, player.canvas[i].width, player.canvas[i].height);
+                player.canvasCtx[i].fillStyle = "rgb(0, 0, 0)";
+                player.canvasCtx[i].fillRect(0, 0, player.canvas[i].width, player.canvas[i].height);
                 let x = 0;
-                this.canvasCtx[i].fillStyle = "rgb(255,50,50)";
-                for (let j = 0; j < this.bufferLengthAlt; j++) {
-                    this.canvasCtx[i].fillRect(
+                player.canvasCtx[i].fillStyle = "rgb(255,50,50)";
+                for (let j = 0; j < player.bufferLengthAlt; j++) {
+                    player.canvasCtx[i].fillRect(
                         x,
-                        this.canvas[i].height - this.dataArrays[i][j],
-                        this.barWidth,
-                        this.dataArrays[i][j]
+                        player.canvas[i].height - player.dataArrays[i][j],
+                        player.barWidth,
+                        player.dataArrays[i][j]
                     );
-                    x += this.barWidth + 1;
+                    x += player.barWidth + 1;
                 }
                 resolve();
             }));
         }
-        Promise.all(this.promises).then(() => {
-            this.promises = [];
+        Promise.all(player.promises).then(() => {
+            player.promises = [];
+            requestAnimationFrame(player.visualize);
         });
     }
 }
