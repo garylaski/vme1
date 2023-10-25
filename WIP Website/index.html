@@ -4,36 +4,14 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Visual Mixer and Equalizer</title>
-        
+        <script src="graphs.js"></script>
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-<script type="text/javascript">
-function showGraph(num)
-{
-    var graphs = document.getElementsByClassName("graph");
-    var graphSelectors = document.getElementsByClassName("graphSelector");
-    for (var i = 0; i < graphs.length; ++i)
-    {
-        graphs[i].style.display = "none";
-        graphSelectors[i].style.background = "white"
-    }
-    
-    graphs[num - 1].style.display = "block";
-    graphSelectors[num-1].style.background = "lightgrey"
-    return false;
-}
-</script>
         <div id="content">
             <header>
                 <h1>Visual Mixer and Equalizer</h1>
             </header>
-            <div id="graphSelect">
-                <button class="graphSelector" id="select1" onclick="showGraph(1)"><b>1</b></button>
-                <button class="graphSelector" id="select2" onclick="showGraph(2)"><b>2</b></button>
-                <button class="graphSelector" id="select3" onclick="showGraph(3)"><b>3</b></button>
-                <button class="graphSelector" id="select4" onclick="showGraph(4)"><b>4</b></button>
-            </div>
 
             <div id="graphs">
                 <div class=graph id=graph1>
@@ -53,25 +31,32 @@ function showGraph(num)
                 </div>
             </div>
 
+            <div id="graphSelect">
+                <button class="graphSelector" id="select1" onclick="showGraph(1)"><b>1</b></button>
+                <button class="graphSelector" id="select2" onclick="showGraph(2)"><b>2</b></button>
+                <button class="graphSelector" id="select3" onclick="showGraph(3)"><b>3</b></button>
+                <button class="graphSelector" id="select4" onclick="showGraph(4)"><b>4</b></button>
+            </div>
+
             <div id="controls">
                 <div class="graphControl">
-                    
+                    <input type="range" orient="vertical" />
                 </div>
 
                 <div class="graphControl">
-                    
+                    <input type="range" orient="vertical" />
                 </div>
 
                 <div class="graphControl">
-                    
+                    <input type="range" orient="vertical" />
                 </div>
 
                 <div class="graphControl">
-                    
+                    <input type="range" orient="vertical" />
                 </div>
-
-                <div class="graphControl">
                     
+                <div class="graphControl">
+                    <input type="range" orient="vertical" />
                 </div>
             </div>
         </div>
