@@ -59,10 +59,15 @@
 }
 
 .graphControl {
+    position: relative;
     width: 20%;
     height: 100%;
     border: 1px solid #000000;
     box-sizing:border-box;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: start;
     float:left;
 }
 
@@ -73,14 +78,46 @@ img {
 }
 
 input[type=range][orient=vertical] {
-    position: relative;
-    top: 10%;
-    left: 70%;
     appearance: slider-vertical;
     writing-mode: bt-lr;
     width: 8px;
     height: 80%;
     padding: 0 5px;
+}
+
+.graphController {
+    width: 50px;
+    border: none;
+    color: white;
+    padding: 16px 0px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 15px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    background: white; 
+    color: black; 
+    border: 2px solid #000000;
+}
+
+.volume {
+    position: absolute;
+    top: 10%;
+    right: 5px;
+}
+
+.gain {
+    position: absolute;
+    top: 10%;
+    right: 25px;
+}
+
+.pan {
+    position: absolute;
+    top: 10%;
+    right: 45px;
 }
 
 </style>
