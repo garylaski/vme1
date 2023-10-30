@@ -4,73 +4,91 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Visual Mixer and Equalizer</title>
-        <script type="module" src="/script.js"></script>
+        <script type="module" src="script.js"></script>
+        <script src="graphs.js"></script>
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
         <div id="content">
-            <div class="visualizer">
-                <canvas></canvas>
-                <div class=visualizerNum>1</div>
+            <header>
+                <h1>Visual Mixer and Equalizer</h1>
+            </header>
+
+            <div id="graphs">
+                <div class="graph visualizer" id=graph1>
+                    <canvas></canvas>
+                </div>
+
+                <div class="graph visualizer" id=graph2>
+                    <canvas></canvas>
+                </div>
+
+                <div class="graph visualizer" id=graph3>
+                    <canvas></canvas>
+                </div>
+
+                <div class="graph visualizer" id=graph4>
+                    <canvas></canvas>
+                </div>
             </div>
-            <div class="visualizer">
-                <canvas></canvas>
-                <div class=visualizerNum>2</div>
+
+            <div id="graphSelect">
+                <button class="graphSelector" id="select1" onclick="showGraph(1)"><b>1</b></button>
+                <button class="graphSelector" id="select2" onclick="showGraph(2)"><b>2</b></button>
+                <button class="graphSelector" id="select3" onclick="showGraph(3)"><b>3</b></button>
+                <button class="graphSelector" id="select4" onclick="showGraph(4)"><b>4</b></button>
             </div>
-            <div class="visualizer">
-                <canvas></canvas>
-                <div class=visualizerNum>3</div>
-            </div>
-            <div class="visualizer">
-                <canvas></canvas>
-                <div class=visualizerNum>4</div>
+
+            <div id="controls">
+                <div class="graphControl">
+                    <button class="graphController solo" ><b>Solo</b></button>
+                    <button class="graphController comp" ><b>Comp</b></button>
+                    <button class="graphController equal" ><b>EQ</b></button>
+                    <button class="graphController mute" ><b>Mute</b></button>
+                    <input class="pan" type="range" orient="vertical" />
+                    <input class="gain" type="range" orient="vertical" />
+                    <input class="volume" type="range" orient="vertical" />
+                </div>
+
+                <div class="graphControl">
+                    <button class="graphController solo" ><b>Solo</b></button>
+                    <button class="graphController comp" ><b>Comp</b></button>
+                    <button class="graphController equal" ><b>EQ</b></button>
+                    <button class="graphController mute" ><b>Mute</b></button>
+                    <input class="pan" type="range" orient="vertical" />
+                    <input class="gain" type="range" orient="vertical" />
+                    <input class="volume" type="range" orient="vertical" />
+                </div>
+
+                <div class="graphControl">
+                    <button class="graphController solo" ><b>Solo</b></button>
+                    <button class="graphController comp" ><b>Comp</b></button>
+                    <button class="graphController equal" ><b>EQ</b></button>
+                    <button class="graphController mute" ><b>Mute</b></button>
+                    <input class="pan" type="range" orient="vertical" />
+                    <input class="gain" type="range" orient="vertical" />
+                    <input class="volume" type="range" orient="vertical" />
+                </div>
+
+                <div class="graphControl">
+                    <button class="graphController solo" ><b>Solo</b></button>
+                    <button class="graphController comp" ><b>Comp</b></button>
+                    <button class="graphController equal" ><b>EQ</b></button>
+                    <button class="graphController mute" ><b>Mute</b></button>
+                    <input class="pan" type="range" orient="vertical" />
+                    <input class="gain" type="range" orient="vertical" />
+                    <input class="volume" type="range" orient="vertical" />
+                </div>
+                    
+                <div class="graphControl">
+                    <button class="graphController reset" ><b>Reset</b></button>
+                    <button class="graphController save" ><b>Save</b></button>
+                    <button class="graphController load" ><b>Load</b></button>
+                    <button class="graphController mute" ><b>Mute</b></button>
+                    <input class="pan" type="range" orient="vertical" />
+                    <input class="volume" type="range" orient="vertical" />
+                </div>
             </div>
         </div>
-        <script>
-            var coll = document.getElementsByClassName("visualizer");
-            var i;
-
-            for (i = 0; i < coll.length; i++) {
-                coll[i].addEventListener("click", function() {
-                    if (this.style.width === "100%") {
-                        this.style.width = "25%";
-                    } else {
-                        this.style.width = "100%";
-                    }
-
-                    var graph = this;
-                    var graph2 = this;
-
-                    while (graph || graph2) {
-                        if (graph) {
-                            graph = graph.previousElementSibling;
-                        }
-
-                        if (graph2) {
-                            graph2 = graph2.nextElementSibling;
-                        }
-
-
-                        if (this.style.width === "25%") {
-                            if (graph) {
-                                graph.style.display = "block";
-                            }
-                            if (graph2) {
-                                graph2.style.display = "block";
-                            }
-                        } else {
-                            if (graph) {
-                                graph.style.display = "none";
-                            }
-                            if (graph2) {
-                                graph2.style.display = "none";
-                            }
-                        }
-                    }
-                });
-            }
-        </script>
-
     </body>
 </html>
-
