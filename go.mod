@@ -33,6 +33,7 @@ require (
 	github.com/pion/webrtc/v3 v3.2.17 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
+	github.com/yobert/alsa v0.0.0-20230126204319-85bb7ee02e5b // indirect
 	golang.org/x/crypto v0.11.0 // indirect
 	golang.org/x/net v0.13.0 // indirect
 	golang.org/x/sys v0.10.0 // indirect

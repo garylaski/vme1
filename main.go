@@ -53,6 +53,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 type audioSource interface {
     Init() (sampleRate int, channels int, bitDepth int)
     Read() (buffer []byte, err error)
+    Close()
 }
 
 func sendPCM(data chan []byte, done chan struct{}) {
@@ -63,7 +64,9 @@ func sendPCM(data chan []byte, done chan struct{}) {
         buf    []byte
         err    error
     )
-    source = &wavSource{}
+    //source = &wavSource{}
+    source = &alsaSource{}
+    defer source.Close()
     sampleRate, numChans, bitDepth := source.Init()
     data <- pcmIntToBytes([]int{sampleRate, numChans, bitDepth}, 32)
     // Calculate the time between each PCM data send lol
