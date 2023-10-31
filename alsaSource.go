@@ -15,23 +15,19 @@ const (
 )
 func (a *alsaSource) Init() (int, int, int) {
     cards, err := alsa.OpenCards()
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, card := range cards {
-		devices, err := card.Devices()
-		if err != nil {
-            log.Fatal(err)
-		}
-		for _, device := range devices {
-			if device.Type != alsa.PCM {
-				continue
-			}
-			if device.Record && a.device == nil {
-				a.device = device
-			}
-		}
-	}
+    if err != nil {
+        log.Fatal(err)
+    }
+    card := cards[1]
+    devices, err := card.Devices()
+    if err != nil {
+        log.Fatal(err)
+    }
+    devices, err = card.Devices()
+    if err != nil {
+        log.Fatal(err)
+    }
+    a.device = devices[1]
 	if a.device == nil {
 		log.Fatal("No recording device found")
 	}
@@ -57,13 +53,9 @@ func (a *alsaSource) Init() (int, int, int) {
     return sampleRate, numChans, bitDepth
 }
 
-func (a *alsaSource) Read() ([]byte, error) {
-    buffer := make([]byte, 1024)
-    if err := a.device.Read(buffer); err != nil {
-        log.Fatal(err)
-    }
-
-    return buffer, nil
+func (a *alsaSource) Read(buffer *[]byte) (error) {
+    err := a.device.Read(*buffer)
+    return err
 }
 
 func (a *alsaSource) Close() {

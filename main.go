@@ -5,12 +5,35 @@ import (
     "log"
     "github.com/gorilla/websocket"
     "time"
+    "os/exec"
 )
 
 func main() {
+    err := setupPCM1864()
+    if err != nil {
+        log.Fatal(err)
+    }
     http.Handle("/", http.FileServer(http.Dir("./static")))
     http.HandleFunc("/ws", wsHandler)
     http.ListenAndServe(":8080", nil)
+}
+
+func setupPCM1864() error {
+    cmds := []*exec.Cmd{
+        exec.Command("i2cset", "-y", "1", "0x4a", "0x20", "0x11"),
+        exec.Command("i2cset", "-y", "1", "0x4a", "0x29", "0x00"),
+        exec.Command("i2cset", "-y", "1", "0x4a", "0x2A", "0x0F"),
+        exec.Command("i2cset", "-y", "1", "0x4a", "0x2B", "0x01"),
+        exec.Command("i2cset", "-y", "1", "0x4a", "0x2C", "0x00"),
+        exec.Command("i2cset", "-y", "1", "0x4a", "0x2D", "0x00"),
+    }
+    for _, cmd := range cmds {
+        err := cmd.Run()
+        if err != nil {
+            return err
+        }
+    }
+    return nil
 }
 
 const (
@@ -52,7 +75,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 // Interface for audio sources, e.g. wav file, gpio, etc.
 type audioSource interface {
     Init() (sampleRate int, channels int, bitDepth int)
-    Read() (buffer []byte, err error)
+    Read(buffer *[]byte) (err error)
     Close()
 }
 
@@ -71,12 +94,13 @@ func sendPCM(data chan []byte, done chan struct{}) {
     data <- pcmIntToBytes([]int{sampleRate, numChans, bitDepth}, 32)
     // Calculate the time between each PCM data send lol
     dt := time.Second * time.Duration(byteBufferSize / bitDepth) / (time.Duration(sampleRate))
+    buf = make([]byte, byteBufferSize)
     log.Printf("dt: %v", dt)
     t := time.Now()
     for {
         if time.Since(t) >= dt {
             t = time.Now()
-            if buf, err = source.Read(); err != nil {
+            if err = source.Read(&buf); err != nil {
                 log.Printf("source.Read: %v", err)
             }
             if buf == nil {
