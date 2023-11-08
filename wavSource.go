@@ -30,12 +30,16 @@ func (w *wavSource) Init() (int, int, int) {
     return int(sampleRate), int(numChans), int(bitDepth)
 }
 
-func (w *wavSource) Read() ([]byte, error) {
+func (w *wavSource) Read(buffer2 *[]byte) (error) {
     // Read audio frames from the decoder
     buffer := &audio.IntBuffer{Data: make([]int, byteBufferSize)}
     if _, err := w.Decoder.PCMBuffer(buffer); err != nil {
-        return nil, err
+        return err
     }
+    *buffer2 = pcmIntToBytes(buffer.Data, w.Decoder.BitDepth)
+    return nil
+}
 
-    return pcmIntToBytes(buffer.Data, w.Decoder.BitDepth), nil
+func (w *wavSource) Close() {
+    w.File.Close()
 }

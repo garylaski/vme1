@@ -9,10 +9,7 @@ import (
 )
 
 func main() {
-    err := setupPCM1864()
-    if err != nil {
-        log.Fatal(err)
-    }
+
     http.Handle("/", http.FileServer(http.Dir("./static")))
     http.HandleFunc("/ws", wsHandler)
     http.ListenAndServe(":8080", nil)
@@ -87,8 +84,8 @@ func sendPCM(data chan []byte, done chan struct{}) {
         buf    []byte
         err    error
     )
-    //source = &wavSource{}
-    source = &alsaSource{}
+    source = &wavSource{}
+    //source = &alsaSource{}
     defer source.Close()
     sampleRate, numChans, bitDepth := source.Init()
     data <- pcmIntToBytes([]int{sampleRate, numChans, bitDepth}, 32)

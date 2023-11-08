@@ -14,6 +14,10 @@ const (
     bitDepth = 32
 )
 func (a *alsaSource) Init() (int, int, int) {
+    err := setupPCM1864()
+    if err != nil {
+        log.Fatal(err)
+    }
     cards, err := alsa.OpenCards()
     if err != nil {
         log.Fatal(err)
