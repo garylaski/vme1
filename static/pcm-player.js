@@ -44,7 +44,9 @@ class PCMPlayer {
   }
 
   initAudioContext() {
-    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+        sampleRate: this.option.sampleRate
+    });
     this.gainNode = this.audioCtx.createGain()
     this.gainNode.gain.value = 0.1
     this.gainNode.connect(this.audioCtx.destination)

@@ -4,39 +4,37 @@ import (
     "net/http"
     "log"
     "github.com/gorilla/websocket"
-    "time"
-    "os/exec"
 )
 
 func main() {
-
     http.Handle("/", http.FileServer(http.Dir("./static")))
     http.HandleFunc("/ws", wsHandler)
     http.ListenAndServe(":8080", nil)
 }
 
-func setupPCM1864() error {
-    cmds := []*exec.Cmd{
-        exec.Command("i2cset", "-y", "1", "0x4a", "0x20", "0x11"),
-        exec.Command("i2cset", "-y", "1", "0x4a", "0x29", "0x00"),
-        exec.Command("i2cset", "-y", "1", "0x4a", "0x2A", "0x0F"),
-        exec.Command("i2cset", "-y", "1", "0x4a", "0x2B", "0x01"),
-        exec.Command("i2cset", "-y", "1", "0x4a", "0x2C", "0x00"),
-        exec.Command("i2cset", "-y", "1", "0x4a", "0x2D", "0x00"),
-    }
-    for _, cmd := range cmds {
-        err := cmd.Run()
-        if err != nil {
-            return err
-        }
-    }
-    return nil
-}
-
 const (
     // The size we send per websocket message, bigger = better? 
-    byteBufferSize = 1024*11
+    byteBufferSize = 1024
 )
+
+func processCommand(h *hardware, conn *websocket.Conn) {
+    for {
+        _, msg, err := conn.ReadMessage()
+        if err != nil {
+            log.Printf("conn.ReadMessage: %v", err)
+            return
+        }
+        log.Printf("msg: %v", msg)
+        switch rune(msg[0]) {
+            // change channel
+        case 'c':
+            h.changePCM1864Channel(msg[1])
+        }
+        if err != nil {
+            log.Printf("changePCM1864Channel: %v", err)
+        }
+    }
+}
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
     // Create a websocket 
@@ -50,10 +48,15 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
         log.Printf("upgrader.Upgrade: %v", err)
     }
     defer conn.Close()
+    h := &hardware{}
+    h.Init()
+    defer h.Close()
     data := make(chan []byte)
     done := make(chan struct{})
     // Run PCM data process its own thread
     go sendPCM(data, done)
+    // Read Commands from websocket
+    go processCommand(h, conn)
     // Read PCM data from channel and send it over websocket
     for {
         select {
@@ -61,7 +64,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
             err = conn.WriteMessage(websocket.BinaryMessage, pcmData)
             if err != nil {
                 log.Printf("conn.WriteMessage: %v", err)
-		return
+                return
             }
         case <-done:
             return
@@ -84,31 +87,24 @@ func sendPCM(data chan []byte, done chan struct{}) {
         buf    []byte
         err    error
     )
-    source = &wavSource{}
-    //source = &alsaSource{}
+    //source = &wavSource{}
+    source = &goalsaSource{}
     defer source.Close()
     sampleRate, numChans, bitDepth := source.Init()
-    data <- pcmIntToBytes([]int{sampleRate, numChans, bitDepth}, 32)
-    // Calculate the time between each PCM data send lol
-    dt := time.Second * time.Duration(byteBufferSize / bitDepth) / (time.Duration(sampleRate))
+    data <- pcmIntToBytes([]int{sampleRate, numChans, bitDepth, byteBufferSize}, 32)
     buf = make([]byte, byteBufferSize)
-    log.Printf("dt: %v", dt)
-    t := time.Now()
     for {
-        if time.Since(t) >= dt {
-            t = time.Now()
-            if err = source.Read(&buf); err != nil {
-                log.Printf("source.Read: %v", err)
-            }
-            if buf == nil {
-		log.Printf("Sending done signal")
-		done <- struct{}{}
-                return
-            }
-            select {
-            case data <- buf:
-            default:
-            }
+        if err = source.Read(&buf); err != nil {
+            log.Printf("source.Read: %v", err)
+        }
+        if buf == nil {
+            log.Printf("Sending done signal")
+            done <- struct{}{}
+            return
+        }
+        select {
+        case data <- buf:
+        default:
         }
     }
 }

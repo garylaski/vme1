@@ -1,12 +1,11 @@
 // connect to websocket and receive PCM data and play it
-
 import PCMPlayer from "./pcm-player.js";
 var ws = new WebSocket("ws://"+window.location.host+"/ws");
 ws.binaryType = "arraybuffer";
 
-showGraph(1);
 ws.onopen = function() {
     console.log("Connection opened");
+    ws.send("init");
 }
 
 var first = true;
@@ -19,23 +18,27 @@ ws.onmessage = function(evt) {
         sampleRate = data[0];
         channels = data[1];
         bitsPerSample = data[2];
+        bufferSize = data[3];
         console.log("Sample rate: " + sampleRate);
         console.log("Channels: " + channels);
         console.log("Bits per sample: " + bitsPerSample);
+        console.log("Buffer size (bytes): " + bufferSize);
+        
         player = new PCMPlayer({
             inputCodec: "Int" + bitsPerSample,
             channels: channels,
             sampleRate: sampleRate,
-            flushingTime: 600
+            flushTime: 20*1000*bufferSize / (sampleRate * channels * (bitsPerSample / 8)),
         });
+        console.log("Flush time: " + player.option.flushTime + "ms");
         init_visualizer(player);
 	second = true;
     } else {
         player.feed(evt.data);
-	if (second && player != undefined) {
-	    requestAnimationFrame(player.visualize);
-	    second = false;
-	}
+	    if (second && player != undefined) {
+	        requestAnimationFrame(player.visualize);
+	        second = false;
+	    }
     }
 }
 
@@ -175,3 +178,18 @@ function interpolate(data, easing = easeInOutSine) {
   // combine the processed first half and the original second half
   return [...output, ...secondHalf]
 }
+
+// add event listeners to the buttons
+document.querySelector("#select1").addEventListener("click", () => {
+    ws.send("c1");
+});
+document.querySelector("#select2").addEventListener("click", () => {
+    ws.send("c2");
+});
+document.querySelector("#select3").addEventListener("click", () => {
+    ws.send("c3");
+});
+document.querySelector("#select4").addEventListener("click", () => {
+    ws.send("c4");
+});
+

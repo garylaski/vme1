@@ -14,10 +14,6 @@ const (
     bitDepth = 32
 )
 func (a *alsaSource) Init() (int, int, int) {
-    err := setupPCM1864()
-    if err != nil {
-        log.Fatal(err)
-    }
     cards, err := alsa.OpenCards()
     if err != nil {
         log.Fatal(err)
@@ -47,8 +43,10 @@ func (a *alsaSource) Init() (int, int, int) {
     if _, err := a.device.NegotiateFormat(alsa.S32_LE); err != nil {
         log.Fatal(err)
     }
-    if _, err := a.device.NegotiateBufferSize(1024); err != nil {
+    if v, err := a.device.NegotiateBufferSize(byteBufferSize / 2); err != nil {
         log.Fatal(err)
+    } else {
+        log.Printf("Negotiated buffer size: %v", v)
     }
     if err := a.device.Prepare(); err != nil {
         log.Fatal(err)
