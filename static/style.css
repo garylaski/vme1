@@ -87,7 +87,7 @@ input[type=range][orient=vertical] {
 
 .graphController {
     position: relative;
-    left: 20%;
+    left: 10%;
     width: 50px;
     border: none;
     color: white;
@@ -107,35 +107,35 @@ input[type=range][orient=vertical] {
 .volume {
     position: absolute;
     top: 10%;
-    right: calc(-30px + 20%);
+    right: calc(-25px + 20%);
 }
 
 .volLabel {
     position: absolute;
     bottom: 10px;
-    right: calc(-30px + 20%);
+    right: calc(-25px + 20%);
 }
 
 .gain {
     position: absolute;
     top: 10%;
-    right: calc(20%);
+    right: calc(20% + 15px);
 }
 
 .gainLabel {
     position: absolute;
     bottom: 10px;
-    right: calc(20% - 6px);
+    right: calc(20% + 9px);
 }
 
 .pan {
     position: absolute;
     top: 10%;
-    right: calc(30px + 20%);
+    right: calc(55px + 20%);
 }
 
 .panLabel {
     position: absolute;
     bottom: 10px;
-    right: calc(30px + 20%);
+    right: calc(55px + 20%);
 }

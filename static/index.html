@@ -31,68 +31,69 @@
 
             <div id="controls">
                 <div class="graphControl">
-                    <button class="graphController solo" ><b>Solo</b></button>
-                    <button class="graphController comp" ><b>Comp</b></button>
-                    <button class="graphController equal" ><b>EQ</b></button>
-                    <button class="graphController mute" ><b>Mute</b></button>
-                    <input class="pan" type="range" orient="vertical" list="tickmarks"/>
+                    <button class="graphController solo" id="solo1"><b>Solo</b></button>
+                    <button class="graphController comp" onclick="window.open('comp.html?graph=1','_blank')"><b>Comp</b></button>
+                    <button class="graphController equal" onclick="window.open('equalizer.html?graph=1','_blank')"><b>EQ</b></button>
+                    <button class="graphController mute" id="mute1"><b>Mute</b></button>
+                    <input class="pan" id="pan1" type="range" orient="vertical" list="tickmarks"/>
                     <b class="panLabel">Pan</b>
-                    <input class="gain" type="range" orient="vertical" />
+                    <input class="gain" id="gain1" type="range" orient="vertical" list="gainTickmarks"/>
                     <b class="gainLabel">Gain</b>
-                    <input class="volume" type="range" orient="vertical" list="tickmarks"/>
+                    <input class="volume" id="vol1" type="range" orient="vertical" list="tickmarks"/>
                     <b class="volLabel">Vol</b>
                 </div>
 
                 <div class="graphControl">
-                    <button class="graphController solo" ><b>Solo</b></button>
-                    <button class="graphController comp" ><b>Comp</b></button>
-                    <button class="graphController equal" ><b>EQ</b></button>
-                    <button class="graphController mute" ><b>Mute</b></button>
-                    <input class="pan" type="range" orient="vertical" list="tickmarks"/>
+                    <button class="graphController solo" id="solo2"><b>Solo</b></button>
+                    <button class="graphController comp" onclick="window.open('comp.html?graph=2','_blank')"><b>Comp</b></button>
+                    <button class="graphController equal" onclick="window.open('equalizer.html?graph=2','_blank')"><b>EQ</b></button>
+                    <button class="graphController mute" id="mute2"><b>Mute</b></button>
+                    <input class="pan" id="pan2" type="range" orient="vertical" list="tickmarks"/>
                     <b class="panLabel">Pan</b>
-                    <input class="gain" type="range" orient="vertical" />
+                    <input class="gain" id="gain2" type="range" orient="vertical" list="gainTickmarks"/>
                     <b class="gainLabel">Gain</b>
-                    <input class="volume" type="range" orient="vertical" list="tickmarks"/>
+                    <input class="volume" id="vol2" type="range" orient="vertical" list="tickmarks"/>
                     <b class="volLabel">Vol</b>
                 </div>
 
                 <div class="graphControl">
-                    <button class="graphController solo" ><b>Solo</b></button>
-                    <button class="graphController comp" ><b>Comp</b></button>
-                    <button class="graphController equal" ><b>EQ</b></button>
-                    <button class="graphController mute" ><b>Mute</b></button>
-                    <input class="pan" type="range" orient="vertical" list="tickmarks"/>
+                    <button class="graphController solo" id="solo3"><b>Solo</b></button>
+                    <button class="graphController comp" onclick="window.open('comp.html?graph=3','_blank')"><b>Comp</b></button>
+                    <button class="graphController equal" onclick="window.open('equalizer.html?graph=3','_blank')"><b>EQ</b></button>
+                    <button class="graphController mute" id="mute3"><b>Mute</b></button>
+                    <input class="pan" id="pan3" type="range" orient="vertical" list="tickmarks"/>
                     <b class="panLabel">Pan</b>
-                    <input class="gain" type="range" orient="vertical" />
+                    <input class="gain" id="gain3" type="range" orient="vertical" list="gainTickmarks"/>
                     <b class="gainLabel">Gain</b>
-                    <input class="volume" type="range" orient="vertical" list="tickmarks"/>
+                    <input class="volume" id="vol3" type="range" orient="vertical" list="tickmarks"/>
                     <b class="volLabel">Vol</b>
                 </div>
 
                 <div class="graphControl">
-                    <button class="graphController solo" ><b>Solo</b></button>
-                    <button class="graphController comp" ><b>Comp</b></button>
-                    <button class="graphController equal" ><b>EQ</b></button>
-                    <button class="graphController mute" ><b>Mute</b></button>
-                    <input class="pan" type="range" orient="vertical" list="tickmarks"/>
+                    <button class="graphController solo" id="solo4"><b>Solo</b></button>
+                    <button class="graphController comp" onclick="window.open('comp.html?graph=4','_blank')"><b>Comp</b></button>
+                    <button class="graphController equal" onclick="window.open('equalizer.html?graph=4','_blank')"><b>EQ</b></button>
+                    <button class="graphController mute" id="mute4"><b>Mute</b></button>
+                    <input class="pan" id="pan4" type="range" orient="vertical" list="tickmarks"/>
                     <b class="panLabel">Pan</b>
-                    <input class="gain" type="range" orient="vertical" />
+                    <input class="gain" id="gain4" type="range" orient="vertical" list="gainTickmarks"/>
                     <b class="gainLabel">Gain</b>
-                    <input class="volume" type="range" orient="vertical" list="tickmarks"/>
+                    <input class="volume" id="vol4" type="range" orient="vertical" list="tickmarks"/>
                     <b class="volLabel">Vol</b>
                 </div>
-                    
                 <div class="graphControl">
-                    <button class="graphController reset" ><b>Reset</b></button>
-                    <button class="graphController save" ><b>Save</b></button>
-                    <button class="graphController load" ><b>Load</b></button>
-                    <button class="graphController mute" ><b>Mute</b></button>
-                    <input class="pan" type="range" orient="vertical" list="tickmarks"/>
+                    <button class="graphController reset" id="reset"><b>Reset</b></button>
+                    <button class="graphController save" id="save"><b>Save</b></button>
+                    <button class="graphController load" id="load"><b>Load</b></button>
+                    <button class="graphController mute" id="muteAll"><b>Mute</b></button>
+                    <input class="pan" id="panAll" type="range" orient="vertical" list="tickmarks"/>
                     <b class="panLabel">Pan</b>
-                    <input class="volume" type="range" orient="vertical" list="tickmarks"/>
+                    <input class="volume" id="volAll" type="range" orient="vertical" list="tickmarks"/>
                     <b class="volLabel">Vol</b>
                 </div>
             </div>
+            
+                    <output id="testOutput"></output>
         </div>
 
 
@@ -108,6 +109,19 @@
         <option value="70"></option>
         <option value="80"></option>
         <option value="90"></option>
+        <option value="100"></option>
+    </datalist>
+
+    <datalist id="gainTickmarks">
+        <option value="0"></option>
+        <option value="5"></option>
+        <option value="10"></option>
+        <option value="20"></option>
+        <option value="30"></option>
+        <option value="40"></option>
+        <option value="50"></option>
+        <option value="60"></option>
+        <option value="80"></option>
         <option value="100"></option>
     </datalist>
 </html>

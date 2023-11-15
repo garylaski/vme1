@@ -193,3 +193,115 @@ document.querySelector("#select4").addEventListener("click", () => {
     ws.send("c4");
 });
 
+document.querySelector("#solo1").addEventListener("click", () => {
+    ws.send("s1");
+});
+document.querySelector("#solo2").addEventListener("click", () => {
+    ws.send("s2");
+});
+document.querySelector("#solo3").addEventListener("click", () => {
+    ws.send("s3");
+});
+document.querySelector("#solo4").addEventListener("click", () => {
+    ws.send("s4");
+});
+
+document.querySelector("#mute1").addEventListener("click", () => {
+    ws.send("m1");
+});
+document.querySelector("#mute2").addEventListener("click", () => {
+    ws.send("m2");
+});
+document.querySelector("#mute3").addEventListener("click", () => {
+    ws.send("m3");
+});
+document.querySelector("#mute4").addEventListener("click", () => {
+    ws.send("m4");
+});
+document.querySelector("#muteAll").addEventListener("click", () => {
+    ws.send("ma");
+});
+
+// add event listeners to sliders, may need to modify slider value before passing
+document.querySelector("#pan1").addEventListener("input", () => {
+    var value = document.getElementById("pan1").value;
+
+    ws.send("p1 " + value);
+});
+document.querySelector("#pan2").addEventListener("input", () => {
+    var value = document.getElementById("pan2").value;
+
+    ws.send("p2 " + value);
+});
+document.querySelector("#pan3").addEventListener("input", () => {
+    var value = document.getElementById("pan3").value;
+
+    ws.send("p3 " + value);
+});
+document.querySelector("#pan4").addEventListener("input", () => {
+    var value = document.getElementById("pan4").value;
+
+    ws.send("p4 " + value);
+});
+document.querySelector("#panAll").addEventListener("input", () => {
+    var value = document.getElementById("panAll").value;
+
+    ws.send("pa " + value);
+});
+
+document.querySelector("#gain1").addEventListener("input", () => {
+    var value = document.getElementById("gain1").value;
+
+    ws.send("g1 " + value);
+});
+document.querySelector("#gain2").addEventListener("input", () => {
+    var value = document.getElementById("gain2").value;
+
+    ws.send("g2 " + value);
+});
+document.querySelector("#gain3").addEventListener("input", () => {
+    var value = document.getElementById("gain3").value;
+
+    ws.send("g3 " + value);
+});
+document.querySelector("#gain4").addEventListener("input", () => {
+    var value = document.getElementById("gain4").value;
+
+    ws.send("g4 " + value);
+});
+
+document.querySelector("#vol1").addEventListener("input", () => {
+    var value = document.getElementById("vol1").value;
+
+    ws.send("v1 " + value);
+});
+document.querySelector("#vol2").addEventListener("input", () => {
+    var value = document.getElementById("vol2").value;
+
+    ws.send("v2 " + value);
+});
+document.querySelector("#vol3").addEventListener("input", () => {
+    var value = document.getElementById("vol3").value;
+
+    ws.send("v3 " + value);
+});
+document.querySelector("#vol4").addEventListener("input", () => {
+    var value = document.getElementById("vol4").value;
+
+    ws.send("v4 " + value);
+});
+document.querySelector("#volAll").addEventListener("input", () => {
+    var value = document.getElementById("volAll").value;
+
+    ws.send("va " + value);
+});
+
+document.querySelector("#reset").addEventListener("click", () => {
+    //behavior
+});
+document.querySelector("#save").addEventListener("click", () => {
+    //behavior
+});
+document.querySelector("#load").addEventListener("click", () => {
+    //behavior
+});
