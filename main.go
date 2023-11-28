@@ -7,6 +7,10 @@ import (
 )
 
 func main() {
+    
+    //h := &hardware{}
+    //h.Init()
+
     http.Handle("/", http.FileServer(http.Dir("./static")))
     http.HandleFunc("/ws", wsHandler)
     http.ListenAndServe(":8080", nil)
@@ -14,7 +18,7 @@ func main() {
 
 const (
     // The size we send per websocket message, bigger = better? 
-    byteBufferSize = 1024
+    byteBufferSize = 1024*11
 )
 
 func processCommand(h *hardware, conn *websocket.Conn) {
@@ -48,15 +52,12 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
         log.Printf("upgrader.Upgrade: %v", err)
     }
     defer conn.Close()
-    h := &hardware{}
-    h.Init()
-    defer h.Close()
+    //go processCommand(h, conn)
     data := make(chan []byte)
     done := make(chan struct{})
     // Run PCM data process its own thread
     go sendPCM(data, done)
     // Read Commands from websocket
-    go processCommand(h, conn)
     // Read PCM data from channel and send it over websocket
     for {
         select {
@@ -98,9 +99,7 @@ func sendPCM(data chan []byte, done chan struct{}) {
             log.Printf("source.Read: %v", err)
         }
         if buf == nil {
-            log.Printf("Sending done signal")
-            done <- struct{}{}
-            return
+            continue
         }
         select {
         case data <- buf:
@@ -125,4 +124,5 @@ func pcmIntToBytes(pcmData []int, bitDepth uint16) []byte {
         }
     }
     return byteData
+
 }
