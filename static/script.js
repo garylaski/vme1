@@ -179,6 +179,21 @@ function interpolate(data, easing = easeInOutSine) {
   return [...output, ...secondHalf]
 }
 
+var pan1 = document.getElementById("pan1");
+var pan2 = document.getElementById("pan2");
+var pan3 = document.getElementById("pan3");
+var pan4 = document.getElementById("pan4");
+var panAll = document.getElementById("panAll");
+var gain1 = document.getElementById("gain1");
+var gain2 = document.getElementById("gain2");
+var gain3 = document.getElementById("gain3");
+var gain4 = document.getElementById("gain4");
+var vol1 = document.getElementById("vol1");
+var vol2 = document.getElementById("vol2");
+var vol3 = document.getElementById("vol3");
+var vol4 = document.getElementById("vol4");
+var volAll = document.getElementById("volAll");
+
 // add event listeners to the buttons
 document.querySelector("#select1").addEventListener("click", () => {
     ws.send("c1");
@@ -222,86 +237,209 @@ document.querySelector("#muteAll").addEventListener("click", () => {
     ws.send("ma");
 });
 
-// add event listeners to sliders, may need to modify slider value before passing
 document.querySelector("#pan1").addEventListener("input", () => {
-    var value = document.getElementById("pan1").value;
+    var value = pan1.value;
+    console.log(value);
 
     ws.send("p1 " + value);
 });
 document.querySelector("#pan2").addEventListener("input", () => {
-    var value = document.getElementById("pan2").value;
+    var value = pan2.value;
 
     ws.send("p2 " + value);
 });
 document.querySelector("#pan3").addEventListener("input", () => {
-    var value = document.getElementById("pan3").value;
+    var value = pan3.value;
 
     ws.send("p3 " + value);
 });
 document.querySelector("#pan4").addEventListener("input", () => {
-    var value = document.getElementById("pan4").value;
+    var value = pan4.value;
 
     ws.send("p4 " + value);
 });
 document.querySelector("#panAll").addEventListener("input", () => {
-    var value = document.getElementById("panAll").value;
+    var value = panAll.value;
 
     ws.send("pa " + value);
 });
 
 document.querySelector("#gain1").addEventListener("input", () => {
-    var value = document.getElementById("gain1").value;
+    var value = gain1.value;
+    var modValue = ((value - 72) * (value - 72)) / 75;
+    
+    if (value < 72)
+    {
+        modValue = 0 - modValue;
+    }
+    console.log(modValue);
 
-    ws.send("g1 " + value);
+    ws.send("g1 " + modValue);
 });
 document.querySelector("#gain2").addEventListener("input", () => {
-    var value = document.getElementById("gain2").value;
+    var value = gain2.value;
+    var modValue = ((value - 72) * (value - 72)) / 75;
 
-    ws.send("g2 " + value);
+    if (value < 72)
+    {
+        modValue = 0 - modValue;
+    }
+
+    ws.send("g2 " + modValue);
 });
 document.querySelector("#gain3").addEventListener("input", () => {
-    var value = document.getElementById("gain3").value;
+    var value = gain3.value;
+    var modValue = ((value - 72) * (value - 72)) / 75;
 
-    ws.send("g3 " + value);
+    if (value < 72)
+    {
+        modValue = 0 - modValue;
+    }
+
+    ws.send("g3 " + modValue);
 });
 document.querySelector("#gain4").addEventListener("input", () => {
-    var value = document.getElementById("gain4").value;
+    var value = gain4.value;
+    var modValue = ((value - 72) * (value - 72)) / 75;
 
-    ws.send("g4 " + value);
+    if (value < 72)
+    {
+        modValue = 0 - modValue;
+    }
+
+    ws.send("g4 " + modValue);
 });
 
 document.querySelector("#vol1").addEventListener("input", () => {
-    var value = document.getElementById("vol1").value;
+    var value = vol1.value;
+    console.log(value);
 
     ws.send("v1 " + value);
 });
 document.querySelector("#vol2").addEventListener("input", () => {
-    var value = document.getElementById("vol2").value;
+    var value = vol2.value;
 
     ws.send("v2 " + value);
 });
 document.querySelector("#vol3").addEventListener("input", () => {
-    var value = document.getElementById("vol3").value;
+    var value = vol3.value;
 
     ws.send("v3 " + value);
 });
 document.querySelector("#vol4").addEventListener("input", () => {
-    var value = document.getElementById("vol4").value;
+    var value = vol4.value;
 
     ws.send("v4 " + value);
 });
 document.querySelector("#volAll").addEventListener("input", () => {
-    var value = document.getElementById("volAll").value;
+    var value = volAll.value;
 
     ws.send("va " + value);
 });
 
 document.querySelector("#reset").addEventListener("click", () => {
-    //behavior
+    pan1.value = 50;
+    pan2.value = 50;
+    pan3.value = 50;
+    pan4.value = 50;
+    panAll.value = 50;
+    gain1.value = 72;
+    gain2.value = 72;
+    gain3.value = 72;
+    gain4.value = 72;
+    vol1.value = 50;
+    vol2.value = 50;
+    vol3.value = 50;
+    vol4.value = 50;
+    volAll.value = 50;
 });
 document.querySelector("#save").addEventListener("click", () => {
-    //behavior
+    var data = {
+        "pan1Val":pan1.value,
+        "pan2Val":pan2.value,
+        "pan3Val":pan3.value,
+        "pan4Val":pan4.value,
+        "panAllVal":panAll.value,
+        "gain1Val":gain1.value,
+        "gain2Val":gain2.value,
+        "gain3Val":gain3.value,
+        "gain4Val":gain4.value,
+        "vol1Val":vol1.value,
+        "vol2Val":vol2.value,
+        "vol3Val":vol3.value,
+        "vol4Val":vol4.value,
+        "volAllVal":volAll.value
+    }
+
+    let jsonString = JSON.stringify(data);
+    localStorage.setItem('sliderValues', jsonString);
 });
 document.querySelector("#load").addEventListener("click", () => {
-    //behavior
+    const jsonString = localStorage.getItem('sliderValues') || '';
+
+    if (jsonString != '')
+    {
+        const obj = JSON.parse(jsonString);
+        pan1.value = obj.pan1Val;
+        pan2.value = obj.pan2Val;
+        pan3.value = obj.pan3Val;
+        pan4.value = obj.pan4Val;
+        panAll.value = obj.panAllVal;
+        gain1.value = obj.gain1Val;
+        gain2.value = obj.gain2Val;
+        gain3.value = obj.gain3Val;
+        gain4.value = obj.gain4Val;
+        vol1.value = obj.vol1Val;
+        vol2.value = obj.vol2Val;
+        vol3.value = obj.vol3Val;
+        vol4.value = obj.vol4Val;
+        volAll.value = obj.volAllVal;
+
+        ws.send("p1 " + pan1.value);
+        ws.send("p2 " + pan2.value);
+        ws.send("p3 " + pan3.value);
+        ws.send("p4 " + pan4.value);
+        ws.send("pa " + panAll.value);
+
+        var modValue = ((gain1.value - 72) * (gain1.value - 72)) / 75;
+
+        if (gain1.value < 72)
+        {
+            modValue = 0 - modValue;
+        }
+
+        ws.send("g1 " + modValue);
+
+        modValue = ((gain2.value - 72) * (gain2.value - 72)) / 75;
+
+        if (gain2.value < 72)
+        {
+            modValue = 0 - modValue;
+        }
+
+        ws.send("g2 " + modValue);
+
+        modValue = ((gain3.value - 72) * (gain3.value - 72)) / 75;
+
+        if (gain3.value < 72)
+        {
+            modValue = 0 - modValue;
+        }
+
+        ws.send("g3 " + modValue);
+
+        modValue = ((gain4.value - 72) * (gain4.value - 72)) / 75;
+
+        if (gain4.value < 72)
+        {
+            modValue = 0 - modValue;
+        }
+
+        ws.send("g4 " + modValue);
+        ws.send("v1 " + vol1.value);
+        ws.send("v2 " + vol2.value);
+        ws.send("v3 " + vol3.value);
+        ws.send("v4 " + vol4.value);
+        ws.send("va " + volAll.value);
+    }
 });

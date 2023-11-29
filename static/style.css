@@ -1,5 +1,5 @@
 #content {
-    width: max(100%, 1000px);
+    width: max(100%, 1260px);
 }
 
 #graphSelect {
@@ -87,7 +87,7 @@ input[type=range][orient=vertical] {
 
 .graphController {
     position: relative;
-    left: 10%;
+    left: calc(10% - 9px);
     width: 50px;
     border: none;
     color: white;
@@ -104,38 +104,136 @@ input[type=range][orient=vertical] {
     border: 2px solid #000000;
 }
 
-.volume {
-    position: absolute;
-    top: 10%;
-    right: calc(-25px + 20%);
-}
-
-.volLabel {
-    position: absolute;
-    bottom: 10px;
-    right: calc(-25px + 20%);
-}
-
-.gain {
-    position: absolute;
-    top: 10%;
-    right: calc(20% + 15px);
-}
-
-.gainLabel {
-    position: absolute;
-    bottom: 10px;
-    right: calc(20% + 9px);
-}
-
 .pan {
     position: absolute;
     top: 10%;
-    right: calc(55px + 20%);
+    right: calc(97px + 20%);
 }
 
 .panLabel {
     position: absolute;
     bottom: 10px;
-    right: calc(55px + 20%);
+    right: calc(97px + 20%);
+}
+
+.panPos {
+    position: absolute;
+    right: calc(82px + 20%);
+}
+
+.panLeft {
+    position: absolute;
+    bottom: calc(9.5%);
+}
+
+.panCenter {
+    position: absolute;
+    bottom: calc(47%);
+}
+
+.panRight {
+    position: absolute;
+    top: calc(10.5%);
+}
+
+.gain {
+    position: absolute;
+    top: 10%;
+    right: calc(20% + 40px);
+}
+
+.gainLabel {
+    position: absolute;
+    bottom: 10px;
+    right: calc(20% + 34px);
+}
+
+.gain-inf {
+    position: absolute;
+    bottom: calc(9.4%);
+    right: calc(20% + 17px);
+}
+
+.gain-60 {
+    position: absolute;
+    bottom: calc(13%);
+    right: calc(20% + 13px);
+}
+
+.gain-48 {
+    position: absolute;
+    bottom: calc(18.5%);
+    right: calc(20% + 13px);
+}
+
+.gain-36 {
+    position: absolute;
+    bottom: calc(24.5%);
+    right: calc(20% + 13px);
+}
+
+.gain-23_5 {
+    position: absolute;
+    bottom: calc(32.3%);
+    right: calc(20% + 3px);
+}
+
+.gain-13_5 {
+    position: absolute;
+    bottom: calc(39.5%);
+    right: calc(20% + 3px);
+}
+
+.gain-3 {
+    position: absolute;
+    top: calc(42.2%);
+    right: calc(20% + 23px);
+}
+
+.gain0 {
+    position: absolute;
+    top: calc(31.3%);
+    right: calc(20% + 28px);
+}
+
+.gain3 {
+    position: absolute;
+    top: calc(19.9%);
+    right: calc(20% + 28px);
+}
+
+.gain10_5 {
+    position: absolute;
+    top: calc(10.3%);
+    right: calc(20% + 8px);
+}
+
+.volume {
+    position: absolute;
+    top: 10%;
+    right: calc(-17px + 20%);
+}
+
+.volLabel {
+    position: absolute;
+    bottom: 10px;
+    right: calc(-17px + 20%);
+}
+
+.vol0 {
+    position: absolute;
+    bottom: calc(9.5%);
+    right: calc(-30px + 20%);
+}
+
+.vol50 {
+    position: absolute;
+    bottom: calc(47%);
+    right: calc(-37px + 20%);
+}
+
+.vol100 {
+    position: absolute;
+    top: calc(10.5%);
+    right: calc(-43px + 20%);
 }
