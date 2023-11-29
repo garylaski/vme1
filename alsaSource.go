@@ -9,7 +9,7 @@ type alsaSource struct {
     device *alsa.Device
 }
 const (
-    sampleRate = 16000
+    sampleRate = 96000
     numChans = 2
     bitDepth = 32
 )
