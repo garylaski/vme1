@@ -3,13 +3,14 @@ package main
 import (
     "net/http"
     "log"
+    "strconv"
     "github.com/gorilla/websocket"
 )
-
+var h *hardware
 func main() {
     
-    //h := &hardware{}
-    //h.Init()
+    h = &hardware{}
+    h.Init()
 
     http.Handle("/", http.FileServer(http.Dir("./static")))
     http.HandleFunc("/ws", wsHandler)
@@ -28,12 +29,30 @@ func processCommand(h *hardware, conn *websocket.Conn) {
             log.Printf("conn.ReadMessage: %v", err)
             return
         }
-        log.Printf("msg: %v", msg)
         switch rune(msg[0]) {
             // change channel
         case 'c':
-            h.changePCM1864Channel(msg[1])
+            //h.changePCM1864Channel(msg[1])
+	    h.setChannel(byte(msg[1]) - 48)
+	case 'p':
+	    channel := byte(msg[1]) - 48
+	    pan, _ := strconv.Atoi(string(msg[3:]))
+	    pan = (254*pan)/100
+	    h.writeEQ(channel, 6, 0, byte(pan/16), 10)
+	    //h.writeMCP4131(channel, h.CS6, pan)
+	case 'v':
+	    channel := byte(msg[1]) - 48
+	    vol, _ := strconv.Atoi(string(msg[3:]))
+	    vol = (254*(100 - vol))/100
+	    h.writeMCP4131(channel, h.CS5, vol)
+	case 'g':
+	    channel := byte(msg[1]) - 48
+	    vol, _ := strconv.Atoi(string(msg[3:]))
+	    vol = (256*vol)/100
+	    h.writeMCP42100(channel, 1, vol)
+
         }
+
         if err != nil {
             log.Printf("changePCM1864Channel: %v", err)
         }
@@ -52,7 +71,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
         log.Printf("upgrader.Upgrade: %v", err)
     }
     defer conn.Close()
-    //go processCommand(h, conn)
+    go processCommand(h, conn)
     data := make(chan []byte)
     done := make(chan struct{})
     // Run PCM data process its own thread

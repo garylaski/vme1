@@ -16,29 +16,52 @@ type hardware struct {
     EQ1 rpio.Pin
     EQ2 rpio.Pin
 }
-const (
-    CS3_PIN = 7 
-    CS4_PIN = 8
-    CS5_PIN = 25
-    CS6_PIN = 26
-    MUX2_PIN  = 22
-    MUX3_PIN  = 27
-    EQ1_PIN = 24
-    EQ2_PIN = 23
-)
+var (
+    CS3_PIN int = 1
+    CS4_PIN int = 8
+    CS5_PIN int = 25
+    CS6_PIN int = 26
+    MUX2_PIN int = 22
+    MUX3_PIN int = 27
+    EQ1_PIN int = 24
+    EQ2_PIN int = 23
+) 
 
 func (h *hardware) Init() {
-    h.setupPCM1864()
-    h.setupMAX5419()
-    h.setupPins()
+    //h.setupPCM1864()
+    //h.setupMAX5419()
     err := rpio.Open()
     if err != nil {
         log.Printf("rpio.Open: %v", err)
     }
+    h.setupPins()
+    rpio.SpiMode(1, 1)
+    rpio.SpiChipSelect(2)
+    rpio.SpiSpeed(100)
     err = rpio.SpiBegin(rpio.Spi0)
     if err != nil {
         log.Printf("Spi0: %v", err)
     }
+    var i byte
+    for i = 1; i < 5; i++ {
+	//Pan 
+    	h.writeMCP4131(i, h.CS6, 127)
+	//Pregain
+    	h.writeMCP4131(i, h.CS5, 127)
+	//Threshold
+    	h.writeMCP4131(i, h.CS4, 255)
+	//Ratio
+	h.writeMCP42100(i, 0, 0)
+	//Outgain?
+	h.writeMCP42100(i, 1, 0)
+    	h.writeEQ(i, 0, 0, 7, 7)
+	h.writeEQ(i, 1, 0, 7, 7)
+	h.writeEQ(i, 2, 0, 7, 7)
+	h.writeEQ(i, 4, 0, 7, 7)
+    }
+    rpio.Pin(9).Low()
+    rpio.Pin(10).Low()
+    rpio.Pin(11).Low()
 }
 
 func (h *hardware) setupPins() {
@@ -58,6 +81,17 @@ func (h *hardware) setupPins() {
     h.MUX3.Output()
     h.EQ1.Output()
     h.EQ2.Output()
+    h.CS3.Low()
+    h.CS4.Low()
+    h.CS5.Low()
+    h.CS6.Low()
+    h.MUX2.Low()
+    h.MUX3.Low()
+    h.EQ1.Low()
+    h.EQ2.Low()
+    rpio.Pin(9).Output()
+    rpio.Pin(10).Output()
+    rpio.Pin(11).Output()
 }
 
 func (h *hardware) setupPCM1864() {
@@ -150,22 +184,21 @@ func (h *hardware) writeMCP42100(channel byte, pot byte, data int) {
     // xx01 -> pot 0
     data = data & 0xff
     command := byte(0x10 | pot)
-    h.CS3.Write(rpio.Low)
+    log.Printf("%b, %b", command, byte(data))
+    h.CS3.Low()
     rpio.SpiTransmit(command, byte(data))
-    h.CS3.Write(rpio.High)
+    h.CS3.High()
 }
 
 func (h* hardware) setChannel(channel byte) {
     // convert channel to binary
     // set CS pins to binary
-    bit1 := channel & 1
-    bit2 := channel & 2
-    if bit1 == 1 {
+    if (channel % 2 == 0) {
         h.MUX2.High()
     } else {
         h.MUX2.Low()
     }
-    if bit2 == 1 {
+    if channel > 2 {
         h.MUX3.High()
     } else {
         h.MUX3.Low()
@@ -190,7 +223,7 @@ func (h *hardware) writeMAX5419(channel uint8, control byte, data int, cs int) {
 
 // https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/ProductDocuments/DataSheets/22060b.pdf
 // Input 0 - 1023
-func (h *hardware) writeMCP4131(channel byte, data int) {
+func (h *hardware) writeMCP4131(channel byte, pin rpio.Pin, data int) {
     h.setChannel(channel)
     // xx00 -> write
     command := byte(0x00)
@@ -198,9 +231,10 @@ func (h *hardware) writeMCP4131(channel byte, data int) {
     data = data & 0x3FF
     data1 := byte(data >> 8)
     data2 := byte(data & 0xFF)
-    h.CS4.Low()
+    //log.Printf("%b %b", command | data1, byte(data))
+    pin.Low()
     rpio.SpiTransmit(command | data1, data2)
-    h.CS4.High()
+    pin.High()
 }
 
 // gain is 0 - 127
@@ -209,11 +243,19 @@ func (h *hardware) writeEQ(channel byte, band byte, center_frequency byte, gain 
     if (channel > 2) {
         EQ = h.EQ2
     }
-    byte1 := (gain & 0x0F) | ( Q & 0x0F << 4)
-    byte2 := (center_frequency & 0x0F) | (channel & 0x01 << 4)
-    byte3 := (band & 0x07) | (0x07 << 3)
-    byte4 := byte(0x04)
+    channelsel := 0x8
+    if (channel % 2 == 1) {
+	    channelsel = 0x4
+    }
+    byte1 := (gain & 0x0F) << 4 
+    byte2 := (center_frequency & 0x0F) << 4 | Q & 0x0F 
+    byte3 := (band & 0x07) << 4 | byte(channelsel)
+    log.Printf("%08b %08b %08b", byte3, byte2, byte1)
+    EQ.Low()
+    rpio.SpiTransmit(0x86)
     EQ.High()
-    rpio.SpiTransmit([]byte{byte1, byte2, byte3, byte4}...)
+    rpio.SpiTransmit(byte3, byte2, byte1)
     EQ.Low()
 }
+
+
