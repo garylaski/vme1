@@ -5,12 +5,14 @@ import (
     "log"
     "strconv"
     "github.com/gorilla/websocket"
+    "strings"
 )
 var h *hardware
 func main() {
-    
-    h = &hardware{}
-    h.Init()
+    if useHardware {
+        h = &hardware{}
+        h.Init()
+    }
 
     http.Handle("/", http.FileServer(http.Dir("./static")))
     http.HandleFunc("/ws", wsHandler)
@@ -18,6 +20,7 @@ func main() {
 }
 
 const (
+    useHardware = false
     // The size we send per websocket message, bigger = better? 
     byteBufferSize = 1024*11
 )
@@ -29,26 +32,32 @@ func processCommand(h *hardware, conn *websocket.Conn) {
             log.Printf("conn.ReadMessage: %v", err)
             return
         }
-	channel := msg[1] - 47
-	log.Printf(string(msg))
+        channel := msg[1] - 47
+        log.Printf(string(msg))
 
         switch rune(msg[0]) {
             // change channel
-        case 'c':
-            //h.changePCM1864Channel(msg[1])
-	    h.setChannel(byte(msg[1]) - 48)
-	case 'p':
-	    pan, _ := strconv.Atoi(string(msg[3:]))
-	    pan = (254*pan)/100
-	    h.writeMCP4131(channel, h.CS6, pan)
-	case 'v':
-	    vol, _ := strconv.Atoi(string(msg[3:]))
-	    vol = (254*(100 - vol))/100
-	    h.writeMCP4131(channel, h.CS5, vol)
-	case 'g':
-	    vol, _ := strconv.Atoi(string(msg[3:]))
-	    vol = (256*vol)/100
-	    h.writeMCP42100(channel, 1, vol)
+        case 'e':
+            //e0 0 5 0 6
+            split := strings.Split(string(msg[3:]), " ")
+            band, _ := strconv.Atoi(split[0])
+            freq, _ := strconv.Atoi(split[1])
+            q, _ := strconv.Atoi(split[2])
+            gain, _ := strconv.Atoi(split[3])
+            h.writeEQ(channel, byte(band), byte(freq), byte(gain), byte(q))
+
+        case 'p':
+            pan, _ := strconv.Atoi(string(msg[3:]))
+            pan = (254*pan)/100
+            h.writeMCP4131(channel, h.CS6, pan)
+        case 'v':
+            vol, _ := strconv.Atoi(string(msg[3:]))
+            vol = (254*(100 - vol))/100
+            h.writeMCP4131(channel, h.CS5, vol)
+        case 'g':
+            vol, _ := strconv.Atoi(string(msg[3:]))
+            vol = (256*vol)/100
+            h.writeMCP42100(channel, 1, vol)
 
         }
 
@@ -70,7 +79,9 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
         log.Printf("upgrader.Upgrade: %v", err)
     }
     defer conn.Close()
-    go processCommand(h, conn)
+    if useHardware {
+        go processCommand(h, conn)
+    }
     data := make(chan []byte)
     done := make(chan struct{})
     // Run PCM data process its own thread
@@ -106,8 +117,11 @@ func sendPCM(data chan []byte, done chan struct{}) {
         buf    []byte
         err    error
     )
-    //source = &wavSource{}
-    source = &goalsaSource{}
+    if useHardware {
+        source = &goalsaSource{}
+    } else {
+        source = &wavSource{}
+    }
     defer source.Close()
     sampleRate, numChans, bitDepth := source.Init()
     data <- pcmIntToBytes([]int{sampleRate, numChans, bitDepth, byteBufferSize}, 32)

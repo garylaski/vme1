@@ -44,20 +44,20 @@ func (h *hardware) Init() {
     }
     var i byte
     for i = 1; i < 5; i++ {
-	//Pan 
-    	h.writeMCP4131(i, h.CS6, 127)
-	//Pregain
-    	h.writeMCP4131(i, h.CS5, 127)
-	//Threshold
-    	h.writeMCP4131(i, h.CS4, 255)
-	//Ratio
-	h.writeMCP42100(i, 0, 0)
-	//Outgain?
-	h.writeMCP42100(i, 1, 0)
-    	h.writeEQ(i, 0, 0, 7, 7)
-	h.writeEQ(i, 1, 0, 7, 7)
-	h.writeEQ(i, 2, 0, 7, 7)
-	h.writeEQ(i, 4, 0, 7, 7)
+        //Pan 
+        h.writeMCP4131(i, h.CS6, 127)
+        //Pregain
+        h.writeMCP4131(i, h.CS5, 127)
+        //Threshold
+        h.writeMCP4131(i, h.CS4, 255)
+        //Ratio
+        h.writeMCP42100(i, 0, 0)
+        //Outgain?
+        h.writeMCP42100(i, 1, 0)
+        h.writeEQ(i, 0, 5, 0, 6)
+        h.writeEQ(i, 1, 5, 0, 6)
+        h.writeEQ(i, 2, 5, 0, 6)
+        h.writeEQ(i, 3, 5, 0, 6)
     }
     rpio.Pin(9).Low()
     rpio.Pin(10).Low()
@@ -237,6 +237,10 @@ func (h *hardware) writeMCP4131(channel byte, pin rpio.Pin, data int) {
     pin.High()
 }
 
+var (
+    be_table = []byte{0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E, 0x01, 0x09, 0x05}
+    gain_table = []byte{0x07, 0x0B, 0x03, 0x0D, 0x05, 0x09, 0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06}
+)
 // gain is 0 - 127
 func (h *hardware) writeEQ(channel byte, band byte, center_frequency byte, gain byte, Q byte) {
     EQ := h.EQ1
@@ -245,11 +249,11 @@ func (h *hardware) writeEQ(channel byte, band byte, center_frequency byte, gain 
     }
     channelsel := 0x8
     if (channel % 2 == 1) {
-	    channelsel = 0x4
+        channelsel = 0x4
     }
-    byte1 := (gain & 0x0F) << 4 
-    byte2 := (center_frequency & 0x0F) << 4 | Q & 0x0F 
-    byte3 := (band & 0x07) << 4 | byte(channelsel)
+    byte1 := gain_table[gain] << 4 
+    byte2 := be_table[center_frequency] << 4 | be_table[Q]
+    byte3 := be_table[band] << 4 | byte(channelsel)
     log.Printf("EQ %08b %08b %08b", byte3, byte2, byte1)
     EQ.Low()
     rpio.SpiTransmit(0x86)
