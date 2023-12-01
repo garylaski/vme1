@@ -29,24 +29,23 @@ func processCommand(h *hardware, conn *websocket.Conn) {
             log.Printf("conn.ReadMessage: %v", err)
             return
         }
+	channel := msg[1] - 47
+	log.Printf(string(msg))
+
         switch rune(msg[0]) {
             // change channel
         case 'c':
             //h.changePCM1864Channel(msg[1])
 	    h.setChannel(byte(msg[1]) - 48)
 	case 'p':
-	    channel := byte(msg[1]) - 48
 	    pan, _ := strconv.Atoi(string(msg[3:]))
 	    pan = (254*pan)/100
-	    h.writeEQ(channel, 6, 0, byte(pan/16), 10)
-	    //h.writeMCP4131(channel, h.CS6, pan)
+	    h.writeMCP4131(channel, h.CS6, pan)
 	case 'v':
-	    channel := byte(msg[1]) - 48
 	    vol, _ := strconv.Atoi(string(msg[3:]))
 	    vol = (254*(100 - vol))/100
 	    h.writeMCP4131(channel, h.CS5, vol)
 	case 'g':
-	    channel := byte(msg[1]) - 48
 	    vol, _ := strconv.Atoi(string(msg[3:]))
 	    vol = (256*vol)/100
 	    h.writeMCP42100(channel, 1, vol)

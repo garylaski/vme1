@@ -3,7 +3,7 @@ import PCMPlayer from "./pcm-player.js";
 var ws = new WebSocket("ws://"+window.location.host+"/ws");
 ws.binaryType = "arraybuffer";
 
-var channelDisplay = [false, false, false, false];
+var channelDisplay = [true, true, true, true];
 var channelSolo = [false, false, false, false];
 var channelMute = [false, false, false, false];
 
@@ -32,7 +32,7 @@ ws.onmessage = function(evt) {
             inputCodec: "Int" + bitsPerSample,
             channels: channels,
             sampleRate: sampleRate,
-            flushTime: 20*1000*bufferSize / (sampleRate * channels * (bitsPerSample / 8)),
+            flushTime: 1000*bufferSize / (sampleRate * channels * (bitsPerSample / 8)),
         });
         console.log("Flush time: " + player.option.flushTime + "ms");
         init_visualizer(player);
@@ -74,7 +74,7 @@ function init_visualizer(player) {
     player.parent = document.querySelector(".visualizer");
     player.canvasCtx = player.canvas.getContext("2d"); 
     player.canvasCtx.imageSmoothingEnabled = false
-    player.visualize = function(ms) {
+    player.visualize = function() {
         player.canvas.width = player.parent.offsetWidth;
         player.canvas.height = player.parent.offsetHeight;
         player.barWidth = player.canvas.width / player.bufferLengthAlt;
@@ -97,6 +97,9 @@ function init_visualizer(player) {
             x -= player.canvas.width / numHz;
         }
         for (let i = 0; i < 2; i++) {
+		if !channelDisplay[i] {
+			continue;
+		}
             player.promises.push(new Promise((resolve, reject) => {
                 player.canvasCtx.beginPath();
                 player.canvasCtx.moveTo(0, player.canvas.height);
@@ -219,7 +222,7 @@ for (let i = 0; i < toggle.length; ++i) {
 
 for (let i = 0; i < displayButtons.length; ++i) {
     displayButtons.item(i).addEventListener("click", (e) => {
-        if(e.target.getAttribute('aria-pressed'))
+        if(e.target.getAttribute('aria-pressed') === 'true')
         {
             channelDisplay[i] = true;
         }
@@ -233,7 +236,7 @@ for (let i = 0; i < displayButtons.length; ++i) {
 for (let i = 0; i < soloButtons.length; ++i) 
 {
     soloButtons.item(i).addEventListener("click", (e) => {
-        if(e.target.getAttribute('aria-pressed'))
+        if(e.target.getAttribute('aria-pressed') === 'true')
         {
             channelSolo[i] = true;
 
@@ -267,13 +270,14 @@ for (let i = 0; i < soloButtons.length; ++i)
                 ws.send("v" + j + " " + volumeValues[j]);
             }
         }
+	console.log(channelSolo);
     });
 }
 
 for (let i = 0; i < muteButtons.length; ++i) 
 {
     muteButtons.item(i).addEventListener("click", (e) => {
-        if(e.target.getAttribute('aria-pressed'))
+        if(e.target.getAttribute('aria-pressed') === 'true')
         {
             channelMute[i] = true;
 
@@ -372,7 +376,7 @@ for (let i = 0; i < volumeSliders.length; ++i)
         {
             ws.send("v" + i + " " + volumeValues[i]);
         }
-        else if (!channelMute[channelMute.length - 1] && (channelSolo[i] || !channelSolo.contains(true)))
+        else if (!channelMute[channelMute.length - 1] && (channelSolo[i] || !channelSolo.includes(true)))
         {
             ws.send("v" + i + " " + volumeValues[i]);
         }
@@ -510,3 +514,12 @@ document.querySelector("#load").addEventListener("click", (e) => {
         }
     }
 });
+band = [low, low_mid, high_mid, high]
+channel = [l, r]
+low_f = [31.5 40 50 63 80 100 125 160 200 250 315]
+low_mid_f = [160 200 250 315 400 500 630 800 1 k 1.25 k 1.6 k]
+high_mid_f = [630 800 1 k 1.25 k 1.6 k 2 k 2.5 k 3.15 k 4 k 5 k 6.3 k]
+high = [1.6 k 2 k 2.5 k 3.15 k 4 k 5 k 6.3 k 8 k 10 k 12.5 k 16 k]
+Q = [0.404 0.667 1.41 2.15 2.87 4.32 5.76 8.65]
+gain = [-12, -10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10, 12]
+

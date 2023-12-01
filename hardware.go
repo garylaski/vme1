@@ -184,7 +184,7 @@ func (h *hardware) writeMCP42100(channel byte, pot byte, data int) {
     // xx01 -> pot 0
     data = data & 0xff
     command := byte(0x10 | pot)
-    log.Printf("%b, %b", command, byte(data))
+    log.Printf("42100: %08b, %08b", command, byte(data))
     h.CS3.Low()
     rpio.SpiTransmit(command, byte(data))
     h.CS3.High()
@@ -231,7 +231,7 @@ func (h *hardware) writeMCP4131(channel byte, pin rpio.Pin, data int) {
     data = data & 0x3FF
     data1 := byte(data >> 8)
     data2 := byte(data & 0xFF)
-    //log.Printf("%b %b", command | data1, byte(data))
+    log.Printf("4131: %08b %08b", command | data1, byte(data))
     pin.Low()
     rpio.SpiTransmit(command | data1, data2)
     pin.High()
@@ -250,7 +250,7 @@ func (h *hardware) writeEQ(channel byte, band byte, center_frequency byte, gain 
     byte1 := (gain & 0x0F) << 4 
     byte2 := (center_frequency & 0x0F) << 4 | Q & 0x0F 
     byte3 := (band & 0x07) << 4 | byte(channelsel)
-    log.Printf("%08b %08b %08b", byte3, byte2, byte1)
+    log.Printf("EQ %08b %08b %08b", byte3, byte2, byte1)
     EQ.Low()
     rpio.SpiTransmit(0x86)
     EQ.High()
