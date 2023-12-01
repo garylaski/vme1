@@ -3,6 +3,10 @@ import PCMPlayer from "./pcm-player.js";
 var ws = new WebSocket("ws://"+window.location.host+"/ws");
 ws.binaryType = "arraybuffer";
 
+var channelDisplay = [false, false, false, false];
+var channelSolo = [false, false, false, false];
+var channelMute = [false, false, false, false];
+
 ws.onopen = function() {
     console.log("Connection opened");
     ws.send("init");
@@ -179,267 +183,330 @@ function interpolate(data, easing = easeInOutSine) {
   return [...output, ...secondHalf]
 }
 
-var pan1 = document.getElementById("pan1");
-var pan2 = document.getElementById("pan2");
-var pan3 = document.getElementById("pan3");
-var pan4 = document.getElementById("pan4");
-var panAll = document.getElementById("panAll");
-var gain1 = document.getElementById("gain1");
-var gain2 = document.getElementById("gain2");
-var gain3 = document.getElementById("gain3");
-var gain4 = document.getElementById("gain4");
-var vol1 = document.getElementById("vol1");
-var vol2 = document.getElementById("vol2");
-var vol3 = document.getElementById("vol3");
-var vol4 = document.getElementById("vol4");
-var volAll = document.getElementById("volAll");
+const toggle = document.querySelectorAll('[aria-pressed]');
+const panSliders = document.getElementsByClassName("pan");
+var panValues = [];
 
-// add event listeners to the buttons
-document.querySelector("#select1").addEventListener("click", () => {
-    ws.send("c1");
-});
-document.querySelector("#select2").addEventListener("click", () => {
-    ws.send("c2");
-});
-document.querySelector("#select3").addEventListener("click", () => {
-    ws.send("c3");
-});
-document.querySelector("#select4").addEventListener("click", () => {
-    ws.send("c4");
-});
+for (let i = 0; i < panSliders.length; ++i) {
+    panValues.push(panSliders[i].value);
+}
 
-document.querySelector("#solo1").addEventListener("click", () => {
-    ws.send("s1");
-});
-document.querySelector("#solo2").addEventListener("click", () => {
-    ws.send("s2");
-});
-document.querySelector("#solo3").addEventListener("click", () => {
-    ws.send("s3");
-});
-document.querySelector("#solo4").addEventListener("click", () => {
-    ws.send("s4");
-});
+const gainSliders = document.getElementsByClassName("gain");
+var gainValues = [];
 
-document.querySelector("#mute1").addEventListener("click", () => {
-    ws.send("m1");
-});
-document.querySelector("#mute2").addEventListener("click", () => {
-    ws.send("m2");
-});
-document.querySelector("#mute3").addEventListener("click", () => {
-    ws.send("m3");
-});
-document.querySelector("#mute4").addEventListener("click", () => {
-    ws.send("m4");
-});
-document.querySelector("#muteAll").addEventListener("click", () => {
-    ws.send("ma");
-});
+for (let i = 0; i < gainSliders.length; ++i) {
+    gainValues.push(gainSliders[i].value);
+}
 
-document.querySelector("#pan1").addEventListener("input", () => {
-    var value = pan1.value;
-    console.log(value);
+const volumeSliders = document.getElementsByClassName("volume");
+var volumeValues = [];
 
-    ws.send("p1 " + value);
-});
-document.querySelector("#pan2").addEventListener("input", () => {
-    var value = pan2.value;
+for (let i = 0; i < volumeSliders.length; ++i) {
+    volumeValues.push(volumeSliders[i].value);
+}
 
-    ws.send("p2 " + value);
-});
-document.querySelector("#pan3").addEventListener("input", () => {
-    var value = pan3.value;
+const displayButtons = document.getElementsByClassName("graphSelector");
+const soloButtons = document.getElementsByClassName("solo");
+const muteButtons = document.getElementsByClassName("mute");
 
-    ws.send("p3 " + value);
-});
-document.querySelector("#pan4").addEventListener("input", () => {
-    var value = pan4.value;
+// Add toggle effect to all buttons
+for (let i = 0; i < toggle.length; ++i) {
+    toggle[i].addEventListener('click', (e) => {  
+       let pressed = e.target.getAttribute('aria-pressed') === 'true';
+       e.target.setAttribute('aria-pressed', String(!pressed));
+    });
+}
 
-    ws.send("p4 " + value);
-});
-document.querySelector("#panAll").addEventListener("input", () => {
-    var value = panAll.value;
+for (let i = 0; i < displayButtons.length; ++i) {
+    displayButtons.item(i).addEventListener("click", (e) => {
+        if(e.target.getAttribute('aria-pressed'))
+        {
+            channelDisplay[i] = true;
+        }
+        else
+        {
+            channelDisplay[i] = false;
+        }
+    });
+}
 
-    ws.send("pa " + value);
-});
+for (let i = 0; i < soloButtons.length; ++i) 
+{
+    soloButtons.item(i).addEventListener("click", (e) => {
+        if(e.target.getAttribute('aria-pressed'))
+        {
+            channelSolo[i] = true;
 
-document.querySelector("#gain1").addEventListener("input", () => {
-    var value = gain1.value;
-    var modValue = ((value - 72) * (value - 72)) / 75;
+            for (let j = 0; j < channelSolo.length; ++j)
+            {
+                if (channelSolo[j] && j != i)
+                {
+                    channelSolo[j] = false;
+                    soloButtons.item(j).setAttribute('aria-pressed', false);
+                }
+            }
+
+            for (let j = 0; j < volumeValues.length - 1; ++j)
+            {
+                if (j == i && !channelMute[i])
+                {
+                    ws.send("v" + j + " " + volumeValues[j]);
+                }
+                else
+                {
+                    ws.send("v" + j + " 0");
+                }
+            }
+        }
+        else
+        {
+            channelSolo[i] = false;
+
+            for (let j = 0; j < volumeValues.length - 1; ++j)
+            {
+                ws.send("v" + j + " " + volumeValues[j]);
+            }
+        }
+    });
+}
+
+for (let i = 0; i < muteButtons.length; ++i) 
+{
+    muteButtons.item(i).addEventListener("click", (e) => {
+        if(e.target.getAttribute('aria-pressed'))
+        {
+            channelMute[i] = true;
+
+            if (i == muteButtons.length - 1)
+            {
+                for (let j = 0; j < volumeValues.length - 1; ++j)
+                {
+                    ws.send("v" + j + " 0");
+                }
+            }
+            else
+            {
+                ws.send("v" + i + " 0");
+            }
+        }
+        else
+        {
+            channelMute[i] = false;
+
+            if (i == muteButtons.length - 1)
+            {
+                for (let j = 0; j < volumeValues.length - 1; ++j)
+                {
+                    if (!channelMute[j])
+                    {
+                        ws.send("v" + j + " " + volumeValues[j]);
+                    }
+                }
+            }
+            else
+            {
+                ws.send("v" + i + " " + volumeValues[i]);
+            }
+        }
+    });
+}
+
+for (let i = 0; i < panSliders.length; ++i) 
+{
+    panSliders.item(i).addEventListener("input", (e) => {
+        panValues[i] = panSliders.item(i).value;
+
+        ws.send("p" + i + " " + panValues[i]);
+    });
+}
+
+for (let i = 0; i < gainSliders.length; ++i) 
+{
+    gainSliders.item(i).addEventListener("input", (e) => {
+        gainValues[i] = gainSliders.item(i).value;
+
+        var modValue = ((gainValues[i] - 72) * (gainValues[i] - 72)) / 75;
     
-    if (value < 72)
+        if (gainValues[i] < 72)
+        {
+            modValue = 0 - modValue;
+        }
+
+        ws.send("g" + i + " " + modValue);
+    });
+}
+
+for (let i = 0; i < volumeSliders.length; ++i) 
+{
+    volumeSliders.item(i).addEventListener("input", (e) => {
+        volumeValues[i] = volumeSliders.item(i).value;
+
+        if (channelMute[i])
+        {
+            channelMute[i] = false;
+            muteButtons.item(i).setAttribute('aria-pressed', false);
+
+            if (i == channelMute.length - 1)
+            {
+                if (!channelSolo.includes(true))
+                {
+                    for (let j = 0; j < volumeValues.length - 1; ++j)
+                    {
+                        ws.send("v" + j + " " + volumeValues[j]);
+                    }
+                }
+                else
+                {
+                    for (let j = 0; j < volumeValues.length - 1; ++j)
+                    {
+                        if (channelSolo[j])
+                        {
+                            ws.send("v" + j + " " + volumeValues[j]);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (i == channelMute.length - 1)
+        {
+            ws.send("v" + i + " " + volumeValues[i]);
+        }
+        else if (!channelMute[channelMute.length - 1] && (channelSolo[i] || !channelSolo.contains(true)))
+        {
+            ws.send("v" + i + " " + volumeValues[i]);
+        }
+    });
+}
+
+document.querySelector("#reset").addEventListener("click", (e) => {
+
+    for (let i = 0; i < channelDisplay.length; ++i) 
     {
-        modValue = 0 - modValue;
+        channelDisplay[i] = false;
+        displayButtons.item(i).setAttribute('aria-pressed', false);
     }
-    console.log(modValue);
 
-    ws.send("g1 " + modValue);
-});
-document.querySelector("#gain2").addEventListener("input", () => {
-    var value = gain2.value;
-    var modValue = ((value - 72) * (value - 72)) / 75;
-
-    if (value < 72)
+    for (let i = 0; i < channelSolo.length; ++i) 
     {
-        modValue = 0 - modValue;
+        channelSolo[i] = false;
+        soloButtons.item(i).setAttribute('aria-pressed', false);
     }
 
-    ws.send("g2 " + modValue);
-});
-document.querySelector("#gain3").addEventListener("input", () => {
-    var value = gain3.value;
-    var modValue = ((value - 72) * (value - 72)) / 75;
-
-    if (value < 72)
+    for (let i = 0; i < channelMute.length; ++i) 
     {
-        modValue = 0 - modValue;
+        channelMute[i] = false;
+        muteButtons.item(i).setAttribute('aria-pressed', false);
     }
 
-    ws.send("g3 " + modValue);
-});
-document.querySelector("#gain4").addEventListener("input", () => {
-    var value = gain4.value;
-    var modValue = ((value - 72) * (value - 72)) / 75;
-
-    if (value < 72)
+    for (let i = 0; i < panSliders.length; ++i) 
     {
-        modValue = 0 - modValue;
+        panSliders.item(i).value = 50;
+        panValues[i] = 50;
+
+        ws.send("p" + i + " " + panValues[i]);
     }
 
-    ws.send("g4 " + modValue);
-});
+    for (let i = 0; i < gainSliders.length; ++i) 
+    {
+        gainSliders.item(i).value = 72;
+        gainValues[i] = 72;
 
-document.querySelector("#vol1").addEventListener("input", () => {
-    var value = vol1.value;
-    console.log(value);
+        ws.send("g" + i + " 0");
+    }
 
-    ws.send("v1 " + value);
-});
-document.querySelector("#vol2").addEventListener("input", () => {
-    var value = vol2.value;
+    for (let i = 0; i < volumeSliders.length; ++i) 
+    {
+        volumeSliders.item(i).value = 50;
+        volumeValues[i] = 50;
 
-    ws.send("v2 " + value);
+        ws.send("v" + i + " " + volumeValues[i]);
+    }
 });
-document.querySelector("#vol3").addEventListener("input", () => {
-    var value = vol3.value;
-
-    ws.send("v3 " + value);
-});
-document.querySelector("#vol4").addEventListener("input", () => {
-    var value = vol4.value;
-
-    ws.send("v4 " + value);
-});
-document.querySelector("#volAll").addEventListener("input", () => {
-    var value = volAll.value;
-
-    ws.send("va " + value);
-});
-
-document.querySelector("#reset").addEventListener("click", () => {
-    pan1.value = 50;
-    pan2.value = 50;
-    pan3.value = 50;
-    pan4.value = 50;
-    panAll.value = 50;
-    gain1.value = 72;
-    gain2.value = 72;
-    gain3.value = 72;
-    gain4.value = 72;
-    vol1.value = 50;
-    vol2.value = 50;
-    vol3.value = 50;
-    vol4.value = 50;
-    volAll.value = 50;
-});
-document.querySelector("#save").addEventListener("click", () => {
+document.querySelector("#save").addEventListener("click", (e) => {
     var data = {
-        "pan1Val":pan1.value,
-        "pan2Val":pan2.value,
-        "pan3Val":pan3.value,
-        "pan4Val":pan4.value,
-        "panAllVal":panAll.value,
-        "gain1Val":gain1.value,
-        "gain2Val":gain2.value,
-        "gain3Val":gain3.value,
-        "gain4Val":gain4.value,
-        "vol1Val":vol1.value,
-        "vol2Val":vol2.value,
-        "vol3Val":vol3.value,
-        "vol4Val":vol4.value,
-        "volAllVal":volAll.value
+        "channelDisplay": channelDisplay,
+        "channelSolo": channelSolo,
+        "channelMute": channelMute,
+        "panValues": panValues,
+        "gainValues": gainValues,
+        "volumeValues": volumeValues
     }
 
     let jsonString = JSON.stringify(data);
-    localStorage.setItem('sliderValues', jsonString);
+    localStorage.setItem('savedLoadout', jsonString);
 });
-document.querySelector("#load").addEventListener("click", () => {
-    const jsonString = localStorage.getItem('sliderValues') || '';
+document.querySelector("#load").addEventListener("click", (e) => {
+    const jsonString = localStorage.getItem('savedLoadout') || '';
 
     if (jsonString != '')
     {
+        console
         const obj = JSON.parse(jsonString);
-        pan1.value = obj.pan1Val;
-        pan2.value = obj.pan2Val;
-        pan3.value = obj.pan3Val;
-        pan4.value = obj.pan4Val;
-        panAll.value = obj.panAllVal;
-        gain1.value = obj.gain1Val;
-        gain2.value = obj.gain2Val;
-        gain3.value = obj.gain3Val;
-        gain4.value = obj.gain4Val;
-        vol1.value = obj.vol1Val;
-        vol2.value = obj.vol2Val;
-        vol3.value = obj.vol3Val;
-        vol4.value = obj.vol4Val;
-        volAll.value = obj.volAllVal;
 
-        ws.send("p1 " + pan1.value);
-        ws.send("p2 " + pan2.value);
-        ws.send("p3 " + pan3.value);
-        ws.send("p4 " + pan4.value);
-        ws.send("pa " + panAll.value);
+        channelDisplay = obj.channelDisplay;
+        channelSolo = obj.channelSolo;
+        channelMute = obj.channelMute;
+        panValues = obj.panValues;
+        gainValues = obj.gainValues;
+        volumeValues = obj.volumeValues;
 
-        var modValue = ((gain1.value - 72) * (gain1.value - 72)) / 75;
-
-        if (gain1.value < 72)
+        for (let i = 0; i < volumeValues.length; ++i)
         {
-            modValue = 0 - modValue;
+            volumeSliders.item(i).value = volumeValues[i];
+            ws.send("v" + i + " " + volumeValues[i]);
         }
 
-        ws.send("g1 " + modValue);
-
-        modValue = ((gain2.value - 72) * (gain2.value - 72)) / 75;
-
-        if (gain2.value < 72)
+        for (let i = 0; i < gainValues.length; ++i)
         {
-            modValue = 0 - modValue;
+            gainSliders.item(i).value = gainValues[i];
+            ws.send("g" + i + " " + gainValues[i]);
         }
 
-        ws.send("g2 " + modValue);
-
-        modValue = ((gain3.value - 72) * (gain3.value - 72)) / 75;
-
-        if (gain3.value < 72)
+        for (let i = 0; i < panValues.length; ++i)
         {
-            modValue = 0 - modValue;
+            panSliders.item(i).value = panValues[i];
+            ws.send("p" + i + " " + panValues[i]);
         }
 
-        ws.send("g3 " + modValue);
-
-        modValue = ((gain4.value - 72) * (gain4.value - 72)) / 75;
-
-        if (gain4.value < 72)
+        for (let i = 0; i < channelSolo.length; ++i)
         {
-            modValue = 0 - modValue;
+            soloButtons.item(i).setAttribute('aria-pressed', channelSolo[i]);
+
+            if (channelSolo[i])
+            {
+                for (let j = 0; j < volumeValues.length - 1; ++j)
+                {
+                    if (j == i)
+                    {
+                        ws.send("v" + j + " " + volumeValues[j]);
+                    }
+                    else
+                    {
+                        ws.send("v" + j + " 0");
+                    }
+                }
+            }
         }
 
-        ws.send("g4 " + modValue);
-        ws.send("v1 " + vol1.value);
-        ws.send("v2 " + vol2.value);
-        ws.send("v3 " + vol3.value);
-        ws.send("v4 " + vol4.value);
-        ws.send("va " + volAll.value);
+        for (let i = 0; i < channelMute.length; ++i)
+        {
+            muteButtons.item(i).setAttribute('aria-pressed', channelMute[i]);
+
+            if (channelMute[i])
+            {
+                if (i == channelMute.length - 1)
+                {
+                    for (let j = 0; j < volumeValues.length - 1; ++j)
+                    {
+                        ws.send("v" + j + " 0");
+                    }
+                }
+                else
+                {
+                    ws.send("v" + i + " 0");
+                }
+            }
+        }
     }
 });

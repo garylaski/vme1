@@ -23,18 +23,18 @@
             </div>
 
             <div id="graphSelect">
-                <button class="graphSelector" id="select1"><b>1</b></button>
-                <button class="graphSelector" id="select2"><b>2</b></button>
-                <button class="graphSelector" id="select3"><b>3</b></button>
-                <button class="graphSelector" id="select4"><b>4</b></button>
+                <button class="graphSelector" id="select1" aria-pressed="false">1</button>
+                <button class="graphSelector" id="select2" aria-pressed="false">2</button>
+                <button class="graphSelector" id="select3" aria-pressed="false">3</button>
+                <button class="graphSelector" id="select4" aria-pressed="false">4</button>
             </div>
 
             <div id="controls">
                 <div class="graphControl">
-                    <button class="graphController solo" id="solo1"><b>Solo</b></button>
-                    <button class="graphController comp" onclick="window.open('comp.html?graph=1','_blank')"><b>Comp</b></button>
-                    <button class="graphController equal" onclick="window.open('equalizer.html?graph=1','_blank')"><b>EQ</b></button>
-                    <button class="graphController mute" id="mute1"><b>Mute</b></button>
+                    <button class="graphController solo" id="solo1" aria-pressed="false">Solo</button>
+                    <button class="graphController comp" onclick="window.open('comp.html?graph=1','_blank')">Comp</button>
+                    <button class="graphController equal" onclick="window.open('equalizer.html?graph=1','_blank')">EQ</button>
+                    <button class="graphController mute" id="mute1" aria-pressed="false">Mute</button>
                     <input class="pan" id="pan1" type="range" orient="vertical" list="tickmarks"/>
                     <b class="panLabel">Pan</b>
                     <b class="panPos panLeft">L</b>
@@ -60,10 +60,10 @@
                 </div>
 
                 <div class="graphControl">
-                    <button class="graphController solo" id="solo2"><b>Solo</b></button>
-                    <button class="graphController comp" onclick="window.open('comp.html?graph=2','_blank')"><b>Comp</b></button>
-                    <button class="graphController equal" onclick="window.open('equalizer.html?graph=2','_blank')"><b>EQ</b></button>
-                    <button class="graphController mute" id="mute2"><b>Mute</b></button>
+                    <button class="graphController solo" id="solo2" aria-pressed="false">Solo</button>
+                    <button class="graphController comp" onclick="window.open('comp.html?graph=2','_blank')">Comp</button>
+                    <button class="graphController equal" onclick="window.open('equalizer.html?graph=2','_blank')">EQ</button>
+                    <button class="graphController mute" id="mute2" aria-pressed="false">Mute</button>
                     <input class="pan" id="pan2" type="range" orient="vertical" list="tickmarks"/>
                     <b class="panLabel">Pan</b>
                     <b class="panPos panLeft">L</b>
@@ -89,10 +89,10 @@
                 </div>
 
                 <div class="graphControl">
-                    <button class="graphController solo" id="solo3"><b>Solo</b></button>
-                    <button class="graphController comp" onclick="window.open('comp.html?graph=3','_blank')"><b>Comp</b></button>
-                    <button class="graphController equal" onclick="window.open('equalizer.html?graph=3','_blank')"><b>EQ</b></button>
-                    <button class="graphController mute" id="mute3"><b>Mute</b></button>
+                    <button class="graphController solo" id="solo3" aria-pressed="false">Solo</button>
+                    <button class="graphController comp" onclick="window.open('comp.html?graph=3','_blank')">Comp</button>
+                    <button class="graphController equal" onclick="window.open('equalizer.html?graph=3','_blank')">EQ</button>
+                    <button class="graphController mute" id="mute3" aria-pressed="false">Mute</button>
                     <input class="pan" id="pan3" type="range" orient="vertical" list="tickmarks"/>
                     <b class="panLabel">Pan</b>
                     <b class="panPos panLeft">L</b>
@@ -118,10 +118,10 @@
                 </div>
 
                 <div class="graphControl">
-                    <button class="graphController solo" id="solo4"><b>Solo</b></button>
-                    <button class="graphController comp" onclick="window.open('comp.html?graph=4','_blank')"><b>Comp</b></button>
-                    <button class="graphController equal" onclick="window.open('equalizer.html?graph=4','_blank')"><b>EQ</b></button>
-                    <button class="graphController mute" id="mute4"><b>Mute</b></button>
+                    <button class="graphController solo" id="solo4" aria-pressed="false">Solo</button>
+                    <button class="graphController comp" onclick="window.open('comp.html?graph=4','_blank')">Comp</button>
+                    <button class="graphController equal" onclick="window.open('equalizer.html?graph=4','_blank')">EQ</button>
+                    <button class="graphController mute" id="mute4" aria-pressed="false">Mute</button>
                     <input class="pan" id="pan4" type="range" orient="vertical" list="tickmarks"/>
                     <b class="panLabel">Pan</b>
                     <b class="panPos panLeft">L</b>
@@ -146,10 +146,10 @@
                     <b class="volNum vol100">100</b>
                 </div>
                 <div class="graphControl">
-                    <button class="graphController reset" id="reset"><b>Reset</b></button>
-                    <button class="graphController save" id="save"><b>Save</b></button>
-                    <button class="graphController load" id="load"><b>Load</b></button>
-                    <button class="graphController mute" id="muteAll"><b>Mute</b></button>
+                    <button class="graphController reset" id="reset">Reset</button>
+                    <button class="graphController save" id="save">Save</button>
+                    <button class="graphController load" id="load">Load</button>
+                    <button class="graphController mute" id="muteAll" aria-pressed="false">Mute</button>
                     <input class="pan" id="panAll" type="range" orient="vertical" list="tickmarks"/>
                     <b class="panLabel">Pan</b>
                     <b class="panPos panLeft">L</b>
