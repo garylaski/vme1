@@ -109,7 +109,7 @@ function sendEQ(band) {
 }
 
 function init_visualizer(player) {
-    player.splitter = player.audioCtx.createChannelSplitter(2);
+    player.splitter = player.audioCtx.createChannelSplitter(4);
     player.gainNode.connect(player.splitter);
     player.analysers = [];
     player.dataArrays = [];
@@ -117,7 +117,7 @@ function init_visualizer(player) {
     player.eqFreqs = [];
     player.eqGains = [];
     player.eqQindex = [];
-    for (let i = 0; i < channels; i++) {
+    for (let i = 0; i < 4; i++) {
         player.analysers[i] = player.audioCtx.createAnalyser();
         player.analysers[i].fftSize = 2048;
         player.splitter.connect(player.analysers[i], i);
@@ -150,7 +150,9 @@ function init_visualizer(player) {
         player.highlighted = -1;
         for (let i = 0; i < 4; i++) {
             let radius = q[player.eqQindex[activeEQ][i]] * 20;
-            if (Math.sqrt(Math.pow(x - player.eqPosX[i], 2) + Math.pow(y - player.eqPosY[i], 2)) < radius) {
+            let eqPosX = [frequencyToX(player.eqFreqs[activeEQ][0]), frequencyToX(player.eqFreqs[activeEQ][1]), frequencyToX(player.eqFreqs[activeEQ][2]), frequencyToX(player.eqFreqs[activeEQ][3])];
+            let eqPosY = [gainToY(player.eqGains[activeEQ][0]), gainToY(player.eqGains[activeEQ][1]), gainToY(player.eqGains[activeEQ][2]), gainToY(player.eqGains[activeEQ][3])];
+            if (Math.sqrt(Math.pow(x - eqPosX[i], 2) + Math.pow(y - eqPosY[i], 2)) < radius) {
                 player.highlighted = i;
                 break;
             }
@@ -224,9 +226,11 @@ function init_visualizer(player) {
 
 
         for (let i = 0; i < channels; i++) {
+		/*
             if (!channelDisplay[i]) {
                 continue;
             }
+	    */
             player.promises.push(new Promise((resolve, reject) => {
                 player.canvasCtx.beginPath();
                 player.canvasCtx.moveTo(0, player.canvas.height);
@@ -445,7 +449,6 @@ for (let i = 0; i < muteButtons.length; ++i)
 for (let i = 0; i < eqButtons.length; ++i)
 {
     eqButtons.item(i).addEventListener("click", (e) => {
-        if (i >= channels) { e.target.setAttribute('aria-pressed', false); return; }
         if(e.target.getAttribute('aria-pressed') === 'true')
         {
             activeEQ = i;
@@ -668,3 +671,15 @@ document.querySelector("#load").addEventListener("click", (e) => {
 channel = [l, r]
 
     */
+document.querySelector("#select1").addEventListener("click", () => {
+	    ws.send("c1");
+});
+document.querySelector("#select2").addEventListener("click", () => {
+	    ws.send("c2");
+});
+document.querySelector("#select3").addEventListener("click", () => {
+	    ws.send("c3");
+});
+document.querySelector("#select4").addEventListener("click", () => {
+	    ws.send("c4");
+});

@@ -4,13 +4,18 @@ import (
     "github.com/d2r2/go-i2c"
     "github.com/stianeikeland/go-rpio/v4"
     "log"
+    "os/exec"
+    "time"
 )
 
 type hardware struct {
     CS3	rpio.Pin
     CS4	rpio.Pin
     CS5	rpio.Pin
-    CS6 rpio.Pin
+    CS6_1 rpio.Pin
+    CS6_2 rpio.Pin
+    CS6_3 rpio.Pin
+    CS6_4 rpio.Pin
     MUX2 rpio.Pin
     MUX3 rpio.Pin
     EQ1 rpio.Pin
@@ -20,7 +25,10 @@ var (
     CS3_PIN int = 1
     CS4_PIN int = 8
     CS5_PIN int = 25
-    CS6_PIN int = 26
+    CS6_1_PIN int = 26
+    CS6_2_PIN int = 0
+    CS6_3_PIN int = 5
+    CS6_4_PIN int = 6
     MUX2_PIN int = 22
     MUX3_PIN int = 27
     EQ1_PIN int = 24
@@ -28,24 +36,26 @@ var (
 ) 
 
 func (h *hardware) Init() {
-    //h.setupPCM1864()
-    //h.setupMAX5419()
+    h.setupPCM1864()
+    h.setupMAX5419()
     err := rpio.Open()
     if err != nil {
         log.Printf("rpio.Open: %v", err)
     }
     h.setupPins()
-    rpio.SpiMode(1, 1)
+    rpio.SpiMode(0, 0)
     rpio.SpiChipSelect(2)
-    rpio.SpiSpeed(100)
+    rpio.SpiSpeed(2000)
     err = rpio.SpiBegin(rpio.Spi0)
     if err != nil {
         log.Printf("Spi0: %v", err)
     }
+    rpio.SpiMode(0, 0)
+    rpio.SpiChipSelect(2)
+    rpio.SpiSpeed(2000)
     var i byte
-    for i = 1; i < 5; i++ {
+    for i = 0; i < 4; i++ {
         //Pan 
-        h.writeMCP4131(i, h.CS6, 127)
         //Pregain
         h.writeMCP4131(i, h.CS5, 127)
         //Threshold
@@ -54,21 +64,22 @@ func (h *hardware) Init() {
         h.writeMCP42100(i, 0, 0)
         //Outgain?
         h.writeMCP42100(i, 1, 0)
-        h.writeEQ(i, 0, 5, 0, 6)
-        h.writeEQ(i, 1, 5, 0, 6)
-        h.writeEQ(i, 2, 5, 0, 6)
-        h.writeEQ(i, 3, 5, 0, 6)
+	gain := byte(12)
+        h.writeEQ(i, 0, 5, gain, 6)
+        h.writeEQ(i, 1, 5, gain, 6)
+        h.writeEQ(i, 2, 5, gain, 6)
+        h.writeEQ(i, 3, 5, gain, 6)
     }
-    rpio.Pin(9).Low()
-    rpio.Pin(10).Low()
-    rpio.Pin(11).Low()
 }
 
 func (h *hardware) setupPins() {
     h.CS3 = rpio.Pin(CS3_PIN)
     h.CS4 = rpio.Pin(CS4_PIN)
     h.CS5 = rpio.Pin(CS5_PIN)
-    h.CS6 = rpio.Pin(CS6_PIN)
+    h.CS6_1 = rpio.Pin(CS6_1_PIN)
+    h.CS6_2 = rpio.Pin(CS6_2_PIN)
+    h.CS6_3 = rpio.Pin(CS6_3_PIN)
+    h.CS6_4 = rpio.Pin(CS6_4_PIN)
     h.MUX2 = rpio.Pin(MUX2_PIN)
     h.MUX3 = rpio.Pin(MUX3_PIN)
     h.EQ1 = rpio.Pin(EQ1_PIN)
@@ -76,7 +87,10 @@ func (h *hardware) setupPins() {
     h.CS3.Output()
     h.CS4.Output()
     h.CS5.Output()
-    h.CS6.Output()
+    h.CS6_1.Output()
+    h.CS6_2.Output()
+    h.CS6_3.Output()
+    h.CS6_4.Output()
     h.MUX2.Output()
     h.MUX3.Output()
     h.EQ1.Output()
@@ -84,7 +98,10 @@ func (h *hardware) setupPins() {
     h.CS3.Low()
     h.CS4.Low()
     h.CS5.Low()
-    h.CS6.Low()
+    h.CS6_1.Low()
+    h.CS6_2.Low()
+    h.CS6_3.Low()
+    h.CS6_4.Low()
     h.MUX2.Low()
     h.MUX3.Low()
     h.EQ1.Low()
@@ -97,6 +114,11 @@ func (h *hardware) setupPins() {
 func (h *hardware) setupPCM1864() {
     // Open i2c bus
     var err error
+    cmd := exec.Command("./setup_adc.sh")
+    if err = cmd.Run(); err != nil {
+	    log.Printf("Setup ADC: %v", err)
+    }
+    /*
     pcm1864, err := i2c.NewI2C(0x4a, 1)
     if err != nil {
         log.Printf("i2c.NewI2C: %v", err)
@@ -104,7 +126,6 @@ func (h *hardware) setupPCM1864() {
     commands := [][]byte{
         // Clock 0001 Master Mode 0001 Auto Clock Detector
         []byte{0x20, 0x11}, 
-        /*
         // PLL Divider P = 1
         []byte{0x29, 0x00}, 
         // PLL Divider R = 16
@@ -115,7 +136,6 @@ func (h *hardware) setupPCM1864() {
         []byte{0x2C, 0x00},
         // PLL J.D Fraction = 0
         []byte{0x2D, 0x00},
-        */
         // 0100 Reveive PCM Word Length = 16, LRCK is 50% 0011 Stereo PCM Word Length = 16, Format = TDM
         //[]byte{0x0B, 0xCF},
         // 0100 Reveive PCM Word Length = 32, LRCK is 50% 0011 Stereo PCM Word Length = 32, Format = TDM
@@ -140,6 +160,7 @@ func (h *hardware) setupPCM1864() {
         }
     }
     pcm1864.Close()
+    */
 }
 
 func (h *hardware) setupMAX5419() {
@@ -150,7 +171,7 @@ func (h *hardware) setupMAX5419() {
             log.Printf("i2c.NewI2C: %v", err)
         }
         //halfway point
-        max5419.WriteBytes([]byte{0x11, 0x80})
+        max5419.WriteBytes([]byte{0x11, 0xFE})
         max5419.Close()
     }
 }
@@ -185,14 +206,18 @@ func (h *hardware) writeMCP42100(channel byte, pot byte, data int) {
     data = data & 0xff
     command := byte(0x10 | pot)
     log.Printf("42100: %08b, %08b", command, byte(data))
+    if useHardware {
     h.CS3.Low()
     rpio.SpiTransmit(command, byte(data))
     h.CS3.High()
+    }
 }
 
 func (h* hardware) setChannel(channel byte) {
     // convert channel to binary
     // set CS pins to binary
+    channel = channel + 0x01
+    log.Printf("Channel: %d", int(channel))
     if (channel % 2 == 0) {
         h.MUX2.High()
     } else {
@@ -219,6 +244,7 @@ func (h *hardware) writeMAX5419(channel uint8, control byte, data int, cs int) {
         log.Printf("i2c.NewI2C: %v", err)
     }
     max5419.WriteBytes([]byte{0x11, byte(data)})
+    max5419.Close()
 }
 
 // https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/ProductDocuments/DataSheets/22060b.pdf
@@ -232,9 +258,11 @@ func (h *hardware) writeMCP4131(channel byte, pin rpio.Pin, data int) {
     data1 := byte(data >> 8)
     data2 := byte(data & 0xFF)
     log.Printf("4131: %08b %08b", command | data1, byte(data))
+    if useHardware {
     pin.Low()
     rpio.SpiTransmit(command | data1, data2)
     pin.High()
+    }
 }
 
 var (
@@ -255,11 +283,26 @@ func (h *hardware) writeEQ(channel byte, band byte, center_frequency byte, gain 
     byte2 := be_table[center_frequency] << 4 | be_table[Q]
     byte3 := be_table[band] << 4 | byte(channelsel)
     log.Printf("EQ %08b %08b %08b", byte3, byte2, byte1)
+    if useHardware {
     EQ.Low()
     rpio.SpiTransmit(0x86)
+    time.Sleep(1*time.Microsecond)
     EQ.High()
-    rpio.SpiTransmit(byte3, byte2, byte1)
+    rpio.SpiTransmit(byte1, byte2, byte3)
     EQ.Low()
+    }
 }
 
-
+func process_bytes(data []byte) [20]bool {
+    var bools [20]bool
+    for i := 0; i < 20; i++ {
+	currbyte := data[i / 8]
+	bit := byte(1 << (i % 8))
+	if (currbyte & bit) == 0 {
+		bools[i] = false
+	} else {
+		bools[i] = true
+	}
+	}
+	return bools
+}
